@@ -550,7 +550,7 @@ const APPS=[
   {id:'age',     icon:'🎂', name:'Age Calculator',           desc:'Your exact age, down to the second',      render:renderAge},
   {id:'lcmhcf',  icon:'🔢', name:'LCM & HCF Calculator',     desc:'Up to 10 numbers at once',                render:renderLcmHcf},
   {id:'bmi',     icon:'⚖️', name:'BMI Calculator',           desc:'WHO-standard body mass index',            render:renderBmi},
-  {id:'zodiac',  icon:'♐',  name:'Zodiac Finder',            desc:'Your sign, traits & compatibility',       render:renderZodiac},
+  {id:'typing',  icon:'⌨️', name:'Typing Speed Test',        desc:'Test your WPM and accuracy',              render:renderTypingTest},
   {id:'dayf',    icon:'📅', name:'What Day Was It?',         desc:'Find the weekday of any date in history', render:renderDayFinder},
   {id:'passck',  icon:'🔐', name:'Password Strength Checker',desc:'Analyse your password locally & safely',  render:renderPasswordChecker},
   {id:'baseconv',icon:'💻', name:'Number Base Converter',    desc:'Binary, Decimal, Octal & Hex',            render:renderBaseConv},
@@ -566,7 +566,7 @@ const ABOUT={
   age:      'Precise real-time age & countdown tool. Created by Kiran Sankar with the assistance of AI.',
   lcmhcf:   'LCM & HCF for up to 10 numbers. Created by Kiran Sankar with the assistance of AI.',
   bmi:      'Body Mass Index calculator with WHO standards. Created by Kiran Sankar with the assistance of AI.',
-  zodiac:   'Zodiac sign finder and meanings. Created by Kiran Sankar with the assistance of AI.',
+  typing:   'Test your typing speed and accuracy. WPM scored in real time. Created by Kiran Sankar with the assistance of AI.',
   dayf:     'Find the weekday of any date in history. Created by Kiran Sankar with the assistance of AI.',
   passck:   'Real-time password strength analyser. Nothing is stored or sent. Created by Kiran Sankar with the assistance of AI.',
   baseconv: 'Convert numbers between Binary, Decimal, Octal and Hexadecimal instantly. Created by Kiran Sankar with the assistance of AI.',
@@ -574,6 +574,8 @@ const ABOUT={
   emi:      'Calculate monthly EMI, total interest and total payable for any loan. Created by Kiran Sankar with the assistance of AI.',
   unitconv: 'Convert between temperature, length, weight and speed units. Created by Kiran Sankar with the assistance of AI.',
   timer:    'A clean stopwatch with lap tracking and a countdown timer. Created by Kiran Sankar with the assistance of AI.',
+  wordcount:'Count words, characters, sentences and reading time from any text. Created by Kiran Sankar with the assistance of AI.',
+  decision: "Can't decide? Enter your options and let the spinner choose for you. Created by Kiran Sankar with the assistance of AI.",
   decision: 'Can\'t decide? Enter your options and let the spinner choose for you. Created by Kiran Sankar with the assistance of AI.'
 };
 
@@ -701,8 +703,10 @@ function renderAge(){
     <div class='inner-card'>
       <h2>🎂 Age Calculator</h2>
       <p class='subtitle'>Your exact age — precise to the second.</p>
+
       <label class='field-label'>Your Name</label>
       <input class='ks-input' id='uname' placeholder='e.g. Kiran Sankar'>
+
       <div class='mt'><label class='field-label'>Date of Birth</label>
       <div class='grid-3'>
         <div>
@@ -717,14 +721,56 @@ function renderAge(){
         </div>
         <div>
           <small style='color:var(--muted);font-size:12px'>Year (1–present)</small>
-          <input class='ks-input mt-sm' id='dobYY' placeholder='YYYY' type='number' min='1' max='2026' oninput='validateDobField(this,1,2026)'>
-          <div class='helper-txt' id='dobYYHelp'>Year must be 1–2026</div>
+          <input class='ks-input mt-sm' id='dobYY' placeholder='YYYY' type='number' min='1' max='9999' oninput='validateDobYY(this)'>
+          <div class='helper-txt' id='dobYYHelp'>Enter a valid year</div>
         </div>
       </div>
       <div class='helper-txt' id='dobHelp'>⚠️ Please enter a valid date.</div></div>
-      <div class='mt'><label class='field-label'>Target Age <span style='color:var(--sub)'>(optional)</span></label>
-      <input class='ks-input' id='targetAge' placeholder='e.g. 30' type='number' min='1' max='150' oninput='validateTargetAge(this)'>
+
+      <div class='mt'><label class='field-label'>Target Age <span style='color:var(--sub);font-size:11px;font-weight:400'>(optional)</span></label>
+      <input class='ks-input' id='targetAge' placeholder='e.g. 30 — countdown to this age' type='number' min='1' max='150' oninput='validateTargetAge(this)'>
       <div class='helper-txt' id='targetAgeHelp'>Target age must be between 1 and 150</div></div>
+
+      <div style='border-top:1px solid var(--border);margin:20px 0;padding-top:16px'>
+        <div class='field-label' style='margin-bottom:4px'>📅 My Age on a Specific Date <span style='color:var(--sub);font-size:11px;font-weight:400'>(optional)</span></div>
+        <p style='font-size:12px;color:var(--muted);margin-bottom:10px'>Enter any past or future date to see what your age was or will be on that day.</p>
+        <div class='grid-3'>
+          <div>
+            <small style='color:var(--muted);font-size:12px'>Day</small>
+            <input class='ks-input mt-sm' id='specDD' placeholder='DD' type='number' min='1' max='31'>
+          </div>
+          <div>
+            <small style='color:var(--muted);font-size:12px'>Month</small>
+            <input class='ks-input mt-sm' id='specMM' placeholder='MM' type='number' min='1' max='12'>
+          </div>
+          <div>
+            <small style='color:var(--muted);font-size:12px'>Year</small>
+            <input class='ks-input mt-sm' id='specYY' placeholder='YYYY' type='number' min='1' max='9999'>
+          </div>
+        </div>
+        <div class='helper-txt' id='specHelp'>⚠️ Enter a valid date.</div>
+      </div>
+
+      <div style='border-top:1px solid var(--border);margin:4px 0 20px;padding-top:16px'>
+        <div class='field-label' style='margin-bottom:4px'>🎯 Date of My Milestone Age <span style='color:var(--sub);font-size:11px;font-weight:400'>(optional)</span></div>
+        <p style='font-size:12px;color:var(--muted);margin-bottom:10px'>Enter an age milestone to find the exact date you reached it.</p>
+        <div class='grid-3'>
+          <div>
+            <small style='color:var(--muted);font-size:12px'>Years</small>
+            <input class='ks-input mt-sm' id='msYears' placeholder='e.g. 18' type='number' min='0'>
+          </div>
+          <div>
+            <small style='color:var(--muted);font-size:12px'>Months</small>
+            <input class='ks-input mt-sm' id='msMonths' placeholder='e.g. 6' type='number' min='0' max='11'>
+          </div>
+          <div>
+            <small style='color:var(--muted);font-size:12px'>Days</small>
+            <input class='ks-input mt-sm' id='msDays' placeholder='e.g. 15' type='number' min='0' max='30'>
+          </div>
+        </div>
+        <div class='helper-txt' id='msHelp'>⚠️ Enter at least years, months or days.</div>
+      </div>
+
       <div class='mt'><button class='btn btn-primary' onclick='startAgeCalc()'>⏱️ Calculate Now</button></div>
       <div id='ageResult'></div>
       ${appFooter('age')}
@@ -768,33 +814,110 @@ function parseDOBParts(){
   dobHelp.style.display='none';[dobDD,dobMM,dobYY].forEach(i=>i.classList.remove('err'));
   return test;
 }
+function ageBreakdown(ms){
+  let diff=Math.abs(ms);
+  const y=Math.floor(diff/31557600000);diff-=y*31557600000;
+  const mo=Math.floor(diff/2629800000);diff-=mo*2629800000;
+  const d=Math.floor(diff/86400000);diff-=d*86400000;
+  const h=Math.floor(diff/3600000);diff-=h*3600000;
+  const mi=Math.floor(diff/60000);diff-=mi*60000;
+  const s=Math.floor(diff/1000);
+  return {y,mo,d,h,mi,s};
+}
+function fmtAge(b){return `${b.y} yrs &nbsp; ${b.mo} Mo &nbsp; ${b.d} days &nbsp; ${b.h} hrs &nbsp; ${b.mi} min &nbsp; ${b.s} sec`;}
+function fmtDateFull(date){
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return days[date.getDay()]+', '+date.getDate()+' '+months[date.getMonth()]+' '+date.getFullYear();
+}
+
 function startAgeCalc(){
-  clearInterval(ageTimer);const dob=parseDOBParts();if(!dob)return;
-  const name=uname.value||'You';const target=parseFloat(targetAge.value);
-  ageTimer=setInterval(()=>{
-    const now=new Date();let diff=now-dob;
-    const y=Math.floor(diff/31557600000);diff-=y*31557600000;
-    const mo=Math.floor(diff/2629800000);diff-=mo*2629800000;
-    const d=Math.floor(diff/86400000);diff-=d*86400000;
-    const h=Math.floor(diff/3600000);diff-=h*3600000;
-    const mi=Math.floor(diff/60000);diff-=mi*60000;
-    const s=Math.floor(diff/1000);
-    let out=`<div class='result-box reveal'><p>${name}, your exact age is:</p><strong>${y} yrs &nbsp; ${mo} Mo &nbsp; ${d} days &nbsp; ${h} hrs &nbsp; ${mi} min &nbsp; ${s} sec</strong>`;
+  clearInterval(ageTimer);
+  const dob=parseDOBParts();if(!dob)return;
+  const name=uname.value||'You';
+  const target=parseFloat(targetAge.value);
+
+  // ── Feature 1: Age on specific date ──
+  let specResult='';
+  const sdd=parseInt(document.getElementById('specDD').value);
+  const smm=parseInt(document.getElementById('specMM').value);
+  const syy=parseInt(document.getElementById('specYY').value);
+  const specHelp=document.getElementById('specHelp');
+  const hasSpec=document.getElementById('specDD').value||document.getElementById('specMM').value||document.getElementById('specYY').value;
+  if(hasSpec){
+    if(!sdd||!smm||!syy||sdd<1||sdd>31||smm<1||smm>12||syy<1){
+      specHelp.style.display='block';return;
+    }
+    const specDate=new Date(syy,smm-1,sdd);
+    if(specDate.getFullYear()!==syy||specDate.getMonth()!==smm-1||specDate.getDate()!==sdd){
+      specHelp.style.display='block';return;
+    }
+    specHelp.style.display='none';
+    if(specDate<dob){
+      specResult=`<div style='margin-top:14px;padding-top:14px;border-top:1px solid var(--border)'>
+        <p style='color:var(--muted);font-size:13px'>📅 On ${fmtDateFull(specDate)}</p>
+        <p style='color:#f87171;font-size:13px'>⚠️ This date is before your date of birth.</p>
+      </div>`;
+    } else {
+      const diff=specDate-dob;
+      const b=ageBreakdown(diff);
+      const isFuture=specDate>new Date();
+      specResult=`<div style='margin-top:14px;padding-top:14px;border-top:1px solid var(--border)'>
+        <p style='color:var(--muted);font-size:13px'>📅 ${isFuture?'On':'On'} ${fmtDateFull(specDate)} ${isFuture?'you will be':'you were'}:</p>
+        <strong style='display:block;margin-top:4px'>${fmtAge(b)}</strong>
+      </div>`;
+    }
+  } else { specHelp.style.display='none'; }
+
+  // ── Feature 2: Date of milestone ──
+  let msResult='';
+  const msY=parseInt(document.getElementById('msYears').value)||0;
+  const msM=parseInt(document.getElementById('msMonths').value)||0;
+  const msD=parseInt(document.getElementById('msDays').value)||0;
+  const msHelp=document.getElementById('msHelp');
+  const hasMs=document.getElementById('msYears').value||document.getElementById('msMonths').value||document.getElementById('msDays').value;
+  if(hasMs){
+    if(msY===0&&msM===0&&msD===0){msHelp.style.display='block';return;}
+    msHelp.style.display='none';
+    const msDate=new Date(dob);
+    msDate.setFullYear(msDate.getFullYear()+msY);
+    msDate.setMonth(msDate.getMonth()+msM);
+    msDate.setDate(msDate.getDate()+msD);
+    const isFuture=msDate>new Date();
+    const timeAgo=isFuture?'':Math.floor((new Date()-msDate)/86400000)+' days ago';
+    msResult=`<div style='margin-top:14px;padding-top:14px;border-top:1px solid var(--border)'>
+      <p style='color:var(--muted);font-size:13px'>🎯 You ${isFuture?'will reach':'reached'} ${msY>0?msY+' yrs ':''} ${msM>0?msM+' Mo ':''} ${msD>0?msD+' days':''}on:</p>
+      <strong style='display:block;margin-top:4px;color:var(--accent)'>${fmtDateFull(msDate)}</strong>
+      ${!isFuture?`<p style='font-size:12px;color:var(--muted);margin-top:4px'>That was ${timeAgo}.</p>`:`<p style='font-size:12px;color:#4ade80;margin-top:4px'>That is in the future! 🌟</p>`}
+    </div>`;
+  } else { msHelp.style.display='none'; }
+
+  // ── Build static shell once (no flicker) ──
+  let shell=`<div class='result-box'>
+    <p>${name}, your exact age right now is:</p>
+    <strong id='ageDisplay' style='display:block;line-height:1.8'></strong>`;
+  if(!isNaN(target)) shell+=`<div id='targetSection' style='margin-top:12px'></div>`;
+  shell+=specResult+msResult+`</div>`;
+  ageResult.innerHTML=shell;
+
+  function tick(){
+    const now=new Date();
+    const b=ageBreakdown(now-dob);
+    const ageEl=document.getElementById('ageDisplay');
+    if(ageEl) ageEl.innerHTML=fmtAge(b);
     if(!isNaN(target)){
+      const tEl=document.getElementById('targetSection');if(!tEl)return;
       const remain=target*31557600000-(now-dob);
       if(remain>0){
-        let r=remain;
-        const ry=Math.floor(r/31557600000);r-=ry*31557600000;
-        const rmo=Math.floor(r/2629800000);r-=rmo*2629800000;
-        const rd=Math.floor(r/86400000);r-=rd*86400000;
-        const rh=Math.floor(r/3600000);r-=rh*3600000;
-        const rmi=Math.floor(r/60000);r-=rmi*60000;
-        const rs=Math.floor(r/1000);
-        out+=`<p style='margin-top:12px'>⏳ Time left to age ${target}:</p><strong>${ry} yrs &nbsp; ${rmo} Mo &nbsp; ${rd} days &nbsp; ${rh} hrs &nbsp; ${rmi} min &nbsp; ${rs} sec</strong>`;
-      }else out+=`<p style='margin-top:12px'>✅ You already crossed age ${target}!</p>`;
+        const r=ageBreakdown(remain);
+        tEl.innerHTML=`<p style='color:var(--muted);font-size:13px;margin-top:4px'>⏳ Time left to age ${target}:</p><strong>${fmtAge(r)}</strong>`;
+      }else{
+        tEl.innerHTML=`<p style='margin-top:4px'>✅ You already crossed age ${target}!</p>`;
+      }
     }
-    out+='</div>';ageResult.innerHTML=out;
-  },1000);
+  }
+  tick();
+  ageTimer=setInterval(tick,1000);
 }
 
 /* ═══════════════════════ LCM & HCF ═══════════════════════ */
@@ -891,86 +1014,123 @@ function calcBmi(){
   </div>`;
 }
 
-/* ═══════════════════════ ZODIAC ═══════════════════════ */
-const ZODIAC_INFO={
-  Aries:{emoji:'♈',traits:'Bold, energetic',strengths:'Courage, leadership',weaknesses:'Impulsive',lucky:'Red 🔴',compat:'Leo, Sagittarius'},
-  Taurus:{emoji:'♉',traits:'Reliable, calm',strengths:'Patience',weaknesses:'Stubborn',lucky:'Green 🟢',compat:'Virgo, Capricorn'},
-  Gemini:{emoji:'♊',traits:'Curious, adaptable',strengths:'Communication',weaknesses:'Inconsistent',lucky:'Yellow 🟡',compat:'Libra, Aquarius'},
-  Cancer:{emoji:'♋',traits:'Emotional, caring',strengths:'Loyalty',weaknesses:'Moody',lucky:'Silver ⚪',compat:'Scorpio, Pisces'},
-  Leo:{emoji:'♌',traits:'Confident, bold',strengths:'Leadership',weaknesses:'Arrogant',lucky:'Gold 🟡',compat:'Aries, Sagittarius'},
-  Virgo:{emoji:'♍',traits:'Analytical, practical',strengths:'Precision',weaknesses:'Overcritical',lucky:'Green 🟢',compat:'Taurus, Capricorn'},
-  Libra:{emoji:'♎',traits:'Balanced, fair',strengths:'Diplomacy',weaknesses:'Indecisive',lucky:'Blue 🔵',compat:'Gemini, Aquarius'},
-  Scorpio:{emoji:'♏',traits:'Intense, passionate',strengths:'Focus',weaknesses:'Jealous',lucky:'Black ⚫',compat:'Cancer, Pisces'},
-  Sagittarius:{emoji:'♐',traits:'Adventurous, optimistic',strengths:'Freedom',weaknesses:'Blunt',lucky:'Purple 🟣',compat:'Aries, Leo'},
-  Capricorn:{emoji:'♑',traits:'Disciplined, ambitious',strengths:'Responsibility',weaknesses:'Rigid',lucky:'Brown 🟫',compat:'Taurus, Virgo'},
-  Aquarius:{emoji:'♒',traits:'Innovative, independent',strengths:'Originality',weaknesses:'Detached',lucky:'Electric Blue 🔵',compat:'Gemini, Libra'},
-  Pisces:{emoji:'♓',traits:'Dreamy, compassionate',strengths:'Empathy',weaknesses:'Escapist',lucky:'Sea Green 🩵',compat:'Cancer, Scorpio'}
-};
-function renderZodiac(){
+/* ═══════════════════════ TYPING SPEED TEST ═══════════════════════ */
+const TYPING_TEXTS=[
+  "The quick brown fox jumps over the lazy dog. Programming is the art of telling another human what one wants the computer to do. Every great developer you know got there by solving problems they were unqualified to solve.",
+  "Technology is best when it brings people together. The science of today is the technology of tomorrow. Innovation distinguishes between a leader and a follower. Stay hungry, stay foolish.",
+  "First solve the problem then write the code. Any fool can write code that a computer can understand. Good programmers write code that humans can understand. Clean code always looks like it was written by someone who cares.",
+  "The computer was born to solve problems that did not exist before. Software is a great combination of artistry and engineering. The best error message is the one that never shows up. Simplicity is the soul of efficiency.",
+  "Learning to write programs stretches your mind and helps you think better. Code is like humor. When you have to explain it, it is bad. Fix the cause not the symptom. Make it work then make it right."
+];
+let typingTimer=null,typingStarted=false,typingDone=false;
+
+function renderTypingTest(){
+  typingStarted=false;typingDone=false;clearInterval(typingTimer);
+  const text=TYPING_TEXTS[Math.floor(Math.random()*TYPING_TEXTS.length)];
   appEl.innerHTML=`<div class='page-wrap'>
     <div class='back-row'><button class='back-btn' onclick="go('apps')">← Apps</button></div>
     <div class='inner-card'>
-      <h2>♐ Zodiac Finder</h2>
-      <p class='subtitle'>Discover your zodiac sign and what it means about you.</p>
-      <label class='field-label'>Your Name</label>
-      <input class='ks-input' id='zname' placeholder='e.g. Kiran'>
-      <div class='mt'><label class='field-label'>Date of Birth</label>
-      <div class='grid-3'>
-        <input class='ks-input' id='zDD' placeholder='DD' type='number' min='1' max='31'>
-        <input class='ks-input' id='zMM' placeholder='MM' type='number' min='1' max='12'>
-        <input class='ks-input' id='zYY' placeholder='YYYY' type='number' min='1' max='9999'>
+      <h2>⌨️ Typing Speed Test</h2>
+      <p class='subtitle'>Type the paragraph below as fast and accurately as you can. Timer starts on your first keystroke! ⏱️</p>
+
+      <div id='tpPrompt' style='background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;font-size:15px;line-height:1.9;letter-spacing:.3px;font-family:DM Sans,sans-serif;word-break:break-word;white-space:normal;overflow-wrap:break-word;max-width:100%;box-sizing:border-box' data-text='${text}'>${renderPromptChars(text)}</div>
+
+      <div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:8px'>
+        <label class='field-label' style='margin:0'>Start Typing Below</label>
+        <div style='display:flex;gap:16px;font-size:13px;color:var(--muted)'>
+          <span>⏱️ <span id='tpTime'>0</span>s</span>
+          <span>🎯 <span id='tpAcc'>100</span>%</span>
+          <span>⚡ <span id='tpWpm'>0</span> WPM</span>
+        </div>
       </div>
-      <div class='helper-txt' id='zHelp'>⚠️ Enter a valid date.</div></div>
-      <div class='mt'><button class='btn btn-primary' onclick='findZodiac()'>✨ Find My Sign</button></div>
-      <div id='zResult'></div>
-      ${appFooter('zodiac')}
+
+      <div style='background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:4px'>
+        <textarea id='tpInput' class='ks-input' rows='4' placeholder='Start typing here...' oninput='onTypingInput(event)' style='background:transparent;border:none;box-shadow:none;resize:none;line-height:1.8;font-size:15px' spellcheck='false' autocomplete='off' autocorrect='off' autocapitalize='off'></textarea>
+      </div>
+
+      <div style='margin-top:12px;display:flex;gap:10px;flex-wrap:wrap'>
+        <button class='btn btn-primary' onclick='resetTypingTest()'>🔄 New Test</button>
+      </div>
+
+      <div id='tpResult'></div>
+      ${appFooter('typing')}
     </div>
   </div>`;
 }
-function parseZDOB(){
-  const dd=+zDD.value,mm=+zMM.value,yy=+zYY.value;
-  if(!dd||!mm||!yy||dd<1||dd>31||mm<1||mm>12||yy<1){
-    zHelp.style.display='block';[zDD,zMM,zYY].forEach(i=>i.classList.add('err'));return null;
+
+function renderPromptChars(text){
+  return text.split('').map((c,i)=>`<span id='tc${i}' style='border-radius:3px'>${c==' '?'&nbsp;':c}</span>`).join('');
+}
+
+function onTypingInput(e){
+  if(typingDone)return;
+  const input=document.getElementById('tpInput');
+  const val=input.value;
+  const prompt=document.getElementById('tpPrompt');
+  const text=prompt.getAttribute('data-text');
+
+  if(!typingStarted&&val.length>0){
+    typingStarted=true;
+    const startTime=Date.now();
+    window._typingStart=startTime;
+    typingTimer=setInterval(()=>{
+      if(!typingStarted||typingDone){clearInterval(typingTimer);return;}
+      const elapsed=Math.floor((Date.now()-window._typingStart)/1000);
+      document.getElementById('tpTime').textContent=elapsed;
+      const words=val.trim().split(/\s+/).filter(w=>w).length;
+      const wpm=elapsed>0?Math.round((words/elapsed)*60):0;
+      document.getElementById('tpWpm').textContent=wpm;
+    },500);
   }
-  zHelp.style.display='none';[zDD,zMM,zYY].forEach(i=>i.classList.remove('err'));
-  return new Date(yy,mm-1,dd);
+
+  // colour each character
+  let correct=0;
+  for(let i=0;i<text.length;i++){
+    const span=document.getElementById('tc'+i);
+    if(!span)continue;
+    if(i<val.length){
+      if(val[i]===text[i]){
+        span.style.background='rgba(74,222,128,0.2)';span.style.color='#4ade80';correct++;
+      }else{
+        span.style.background='rgba(248,113,113,0.25)';span.style.color='#f87171';
+      }
+    }else{
+      span.style.background='';span.style.color='';
+    }
+  }
+
+  const acc=val.length>0?Math.round((correct/Math.min(val.length,text.length))*100):100;
+  document.getElementById('tpAcc').textContent=acc;
+
+  // finished
+  if(val.length>=text.length){
+    typingDone=true;clearInterval(typingTimer);
+    const elapsed=(Date.now()-window._typingStart)/1000;
+    const words=text.trim().split(/\s+/).length;
+    const wpm=Math.round((words/elapsed)*60);
+    const finalAcc=Math.round((correct/text.length)*100);
+    let grade='',emoji='';
+    if(wpm>=80&&finalAcc>=95){grade='Expert 🏆';emoji='🔥';}
+    else if(wpm>=60&&finalAcc>=90){grade='Advanced ⭐';emoji='💪';}
+    else if(wpm>=40&&finalAcc>=85){grade='Intermediate 👍';emoji='😊';}
+    else if(wpm>=20){grade='Beginner 🌱';emoji='😅';}
+    else{grade='Keep Practicing 💡';emoji='🤔';}
+    document.getElementById('tpResult').innerHTML=`<div class='result-box reveal' style='text-align:center;margin-top:14px'>
+      <div style='font-size:2.5rem;margin-bottom:8px'>${emoji}</div>
+      <table class='who-table' style='text-align:left'>
+        <tr><td>⚡ WPM</td><td><strong style='color:var(--accent);font-size:1.3rem'>${wpm}</strong></td></tr>
+        <tr><td>🎯 Accuracy</td><td><strong style='color:${finalAcc>=90?"#4ade80":"#f87171"}'>${finalAcc}%</strong></td></tr>
+        <tr><td>⏱️ Time Taken</td><td><strong>${elapsed.toFixed(1)}s</strong></td></tr>
+        <tr><td>📊 Level</td><td><strong>${grade}</strong></td></tr>
+      </table>
+      <button class='btn btn-primary' style='margin-top:14px;width:100%' onclick='resetTypingTest()'>🔄 Try Again</button>
+    </div>`;
+  }
 }
-function findZodiac(){
-  zResult.innerHTML='';const d=parseZDOB();if(!d)return;
-  const m=d.getMonth()+1,day=d.getDate();
-  let s='Aries';
-  if((m==3&&day>=21)||(m==4&&day<=19))s='Aries';
-  else if((m==4&&day>=20)||(m==5&&day<=20))s='Taurus';
-  else if((m==5&&day>=21)||(m==6&&day<=20))s='Gemini';
-  else if((m==6&&day>=21)||(m==7&&day<=22))s='Cancer';
-  else if((m==7&&day>=23)||(m==8&&day<=22))s='Leo';
-  else if((m==8&&day>=23)||(m==9&&day<=22))s='Virgo';
-  else if((m==9&&day>=23)||(m==10&&day<=22))s='Libra';
-  else if((m==10&&day>=23)||(m==11&&day<=21))s='Scorpio';
-  else if((m==11&&day>=22)||(m==12&&day<=21))s='Sagittarius';
-  else if((m==12&&day>=22)||(m==1&&day<=19))s='Capricorn';
-  else if((m==1&&day>=20)||(m==2&&day<=18))s='Aquarius';
-  else s='Pisces';
-  const n=zname.value||'You';
-  zResult.innerHTML=`<div class='result-box reveal' style='text-align:center'>
-    <div style='font-size:3rem;margin-bottom:8px'>${ZODIAC_INFO[s].emoji}</div>
-    <p>${n}'s Zodiac Sign</p><strong>${s}</strong>
-    <button class='btn btn-secondary' style='margin-top:14px;width:100%' onclick='showZodiacInfo("${s}","${n}")'>🔍 Know More About ${s}</button>
-  </div>`;
-}
-function showZodiacInfo(s,n){
-  const i=ZODIAC_INFO[s];
-  zResult.innerHTML=`<div class='result-box reveal'>
-    <div style='text-align:center;font-size:2.5rem;margin-bottom:12px'>${i.emoji}</div>
-    <p>${n} — <strong style='color:var(--accent)'>${s}</strong></p>
-    <table class='who-table' style='margin-top:10px'>
-      <tr><td style='color:var(--muted)'>Traits</td><td>${i.traits}</td></tr>
-      <tr><td style='color:var(--muted)'>Strengths</td><td>${i.strengths}</td></tr>
-      <tr><td style='color:var(--muted)'>Weaknesses</td><td>${i.weaknesses}</td></tr>
-      <tr><td style='color:var(--muted)'>Lucky Color</td><td>${i.lucky}</td></tr>
-      <tr><td style='color:var(--muted)'>Compatibility</td><td>${i.compat}</td></tr>
-    </table>
-  </div>`;
+
+function resetTypingTest(){
+  clearInterval(typingTimer);typingStarted=false;typingDone=false;
+  renderTypingTest();
 }
 
 /* ═══════════════════════ DAY FINDER ═══════════════════════ */
@@ -1118,6 +1278,7 @@ function evalPw(val){
   const barColors=['#e05a5a','#e05a5a','#e07040','#e0944a','#d4c843','#4ade80','#4ade80','#a78bfa'];
   for(let i=1;i<=5;i++){const seg=document.getElementById('pb'+i);seg.style.background=i<=v.bars?(barColors[level-1]||'#1e1e2e'):'var(--surface2)';}
 }
+
 
 /* ═══════════════════════ NUMBER BASE CONVERTER ═══════════════════════ */
 function renderBaseConv(){
