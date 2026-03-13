@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8"/>
@@ -589,7 +589,9 @@ const APPS=[
   {id:'emi',     icon:'💸', name:'EMI / Loan Calculator',    desc:'Monthly EMI, interest & total payable',   render:renderEmi},
   {id:'unitconv',icon:'🌡️', name:'Unit Converter',           desc:'Temperature, length, weight & speed',     render:renderUnitConv},
   {id:'timer',   icon:'⏱️', name:'Stopwatch & Timer',        desc:'Stopwatch with laps + countdown timer',   render:renderTimer},
-  {id:'decision',icon:'🎲', name:'Random Decision Maker',    desc:"Spin to decide when you can't choose",    render:renderDecision}
+  {id:'decision',icon:'🎲', name:'Random Decision Maker',    desc:"Spin to decide when you can't choose",    render:renderDecision},
+  {id:'calchub',  icon:'🧮', name:'Calculator Hub',              desc:'Simple, Scientific, Engineering, Percentage & Financial — all in one', render:renderCalcHub},
+  {id:'numwords', icon:'🔤', name:'Number to Words',             desc:'Convert any number to words — perfect for cheques & docs', render:renderNumWords}
 ];
 
 /* ── ABOUT TEXTS ── */
@@ -605,9 +607,9 @@ const ABOUT={
   emi:      'Calculate monthly EMI, total interest and total payable for any loan. Created by Kiran Sankar with the assistance of AI.',
   unitconv: 'Convert between temperature, length, weight and speed units. Created by Kiran Sankar with the assistance of AI.',
   timer:    'A clean stopwatch with lap tracking and a countdown timer. Created by Kiran Sankar with the assistance of AI.',
-  wordcount:'Count words, characters, sentences and reading time from any text. Created by Kiran Sankar with the assistance of AI.',
   decision: "Can't decide? Enter your options and let the spinner choose for you. Created by Kiran Sankar with the assistance of AI.",
-  decision: 'Can\'t decide? Enter your options and let the spinner choose for you. Created by Kiran Sankar with the assistance of AI.'
+  calchub:  'The ultimate Calculator Hub — Simple, Scientific, Engineering, Percentage and Financial calculators all in one place. Created by Kiran Sankar with the assistance of AI.',
+  numwords: 'Convert numbers to words, words to numbers, numbers to Roman numerals and Roman numerals to numbers. Created by Kiran Sankar with the assistance of AI.'
 };
 
 function showAbout(id){
@@ -652,7 +654,7 @@ function renderHome(){
       <button class='btn btn-ghost' onclick="scrollContact()">✉️ Get in Touch</button>
     </div>
     <div class='stat-strip'>
-      <div class='stat-item'><div class='stat-num'>12</div><div class='stat-lbl'>Apps Built</div></div>
+      <div class='stat-item'><div class='stat-num'>14</div><div class='stat-lbl'>Apps Built</div></div>
       <div class='stat-item'><div class='stat-num'>100%</div><div class='stat-lbl'>Free to Use</div></div>
       <div class='stat-item'><div class='stat-num'>0</div><div class='stat-lbl'>Data Stored</div></div>
       <div class='stat-item'><div class='stat-num'>∞</div><div class='stat-lbl'>Curiosity</div></div>
@@ -710,9 +712,13 @@ function renderAppList(){
         <h2>Apps by Kiran Sankar</h2>
       </div>
     </div>
-    <div class='apps-grid'>
+    <div style='position:relative;margin-bottom:16px'>
+      <span style='position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none'>🔍</span>
+      <input class='ks-input' id='appSearch' placeholder='Search apps...' oninput='filterApps(this.value)' style='padding-left:44px;'>
+    </div>
+    <div class='apps-grid' id='appsGrid'>
       ${APPS.map(a=>`
-      <div class='app-card' onclick="go('${a.id}')">
+      <div class='app-card' onclick="go('${a.id}')" data-name='${a.name.toLowerCase()}' data-desc='${a.desc.toLowerCase()}'>
         <div class='app-card-left'>
           <div class='app-icon'>${a.icon}</div>
           <div>
@@ -723,7 +729,23 @@ function renderAppList(){
         <div class='app-arrow'>→</div>
       </div>`).join('')}
     </div>
+    <div id='noAppsMsg' style='display:none;text-align:center;padding:32px;color:var(--muted);font-size:14px'>😕 No apps found for that search.</div>
   </div>`;
+}
+
+function filterApps(query){
+  const q = query.toLowerCase().trim();
+  const cards = document.querySelectorAll('#appsGrid .app-card');
+  let visible = 0;
+  cards.forEach(card => {
+    const name = card.dataset.name || '';
+    const desc = card.dataset.desc || '';
+    const match = !q || name.includes(q) || desc.includes(q);
+    card.style.display = match ? '' : 'none';
+    if(match) visible++;
+  });
+  const noMsg = document.getElementById('noAppsMsg');
+  if(noMsg) noMsg.style.display = visible === 0 ? 'block' : 'none';
 }
 
 /* ═══════════════════════ AGE CALCULATOR ═══════════════════════ */
@@ -1299,8 +1321,12 @@ function evalPw(val){
   setCrit('pc-len',lenOk);setCrit('pc-upper',hasUpper);setCrit('pc-lower',hasLower);setCrit('pc-num',hasNum);setCrit('pc-sym',hasSym);setCrit('pc-long',lenLong);
   let score=0;
   if(val.length>0){
-    if(lenOk)score+=20;if(hasUpper)score+=15;if(hasLower)score+=15;if(hasNum)score+=20;if(hasSym)score+=20;if(lenLong)score+=10;
+    if(lenOk)score+=20;
+    if(hasUpper)score+=15;if(hasLower)score+=15;if(hasNum)score+=20;if(hasSym)score+=20;
+    if(lenLong)score+=10;
     if(val.length>=16)score=Math.min(score+5,100);
+    // Cap score at 20 if length requirement not met — short passwords can't be strong
+    if(!lenOk) score=Math.min(score,15);
   }
   document.getElementById('pwScore').textContent=score;
   let level=0;
@@ -1588,9 +1614,577 @@ function spinDecision(){
   animate();
 }
 
+
+/* ═══════════════════════════════════════
+   CALCULATOR HUB
+═══════════════════════════════════════ */
+function renderCalcHub(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('apps')">← Apps</button></div>
+    <div class='inner-card'>
+      <h2>🧮 Calculator Hub</h2>
+      <p class='subtitle'>Every calculator you'll ever need — all in one place.</p>
+      <div style='display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px' id='calcTabs'>
+        <button class='calc-tab active' onclick='switchCalc("simple",this)'>Simple</button>
+        <button class='calc-tab' onclick='switchCalc("scientific",this)'>Scientific</button>
+        <button class='calc-tab' onclick='switchCalc("engineering",this)'>Engineering</button>
+        <button class='calc-tab' onclick='switchCalc("percentage",this)'>Percentage</button>
+        <button class='calc-tab' onclick='switchCalc("financial",this)'>Financial</button>
+      </div>
+      <div id='calcBody'></div>
+      ${appFooter('calchub')}
+    </div>
+  </div>`;
+  // Inject styles
+  if(!document.getElementById('calcHubStyle')){
+    const s=document.createElement('style');
+    s.id='calcHubStyle';
+    s.textContent=`
+      .calc-tab{padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--bg2);color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;transition:all .2s;}
+      .calc-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+      .calc-display{background:#0a0c14;border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:14px;text-align:right;}
+      .calc-expr{font-size:13px;color:var(--muted);min-height:18px;font-family:'Rajdhani',sans-serif;}
+      .calc-val{font-size:2.2rem;font-weight:600;color:var(--text);font-family:'Rajdhani',sans-serif;word-break:break-all;}
+      .calc-grid{display:grid;gap:8px;}
+      .calc-grid-4{grid-template-columns:repeat(4,1fr);}
+      .calc-grid-5{grid-template-columns:repeat(5,1fr);}
+      .cb{padding:16px 8px;border-radius:12px;border:none;font-size:1rem;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;transition:transform .1s,opacity .2s;}
+      .cb:active{transform:scale(.93);}
+      .cb-num{background:#1a2236;color:var(--text);}
+      .cb-op{background:#2a1a1a;color:var(--accent);}
+      .cb-fn{background:#1a1a2e;color:#a89fff;font-size:.85rem;}
+      .cb-eq{background:var(--accent);color:#fff;}
+      .cb-clear{background:#2a1020;color:#f87171;}
+      .cb-zero{grid-column:span 2;}
+      .pct-row{display:flex;flex-direction:column;gap:12px;margin-bottom:8px;}
+      .pct-label{font-size:13px;color:var(--muted);margin-bottom:4px;}
+      .pct-result{background:#0a0c14;border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;font-family:'Rajdhani',sans-serif;font-size:1.4rem;color:var(--accent);font-weight:600;min-height:48px;}
+      .fin-row{margin-bottom:12px;}
+    `;
+    document.head.appendChild(s);
+  }
+  switchCalc('simple', document.querySelector('.calc-tab'));
+}
+
+let calcExpr='', calcVal='0', calcNewNum=true;
+
+function switchCalc(mode, btn){
+  document.querySelectorAll('.calc-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  calcExpr=''; calcVal='0'; calcNewNum=true;
+  const body=document.getElementById('calcBody');
+  if(mode==='simple') body.innerHTML=buildSimpleCalc();
+  else if(mode==='scientific') body.innerHTML=buildSciCalc();
+  else if(mode==='engineering') body.innerHTML=buildEngCalc();
+  else if(mode==='percentage') body.innerHTML=buildPctCalc();
+  else if(mode==='financial') body.innerHTML=buildFinCalc();
+}
+
+function calcDisplay(val,expr){
+  const v=document.getElementById('calcVal');
+  const e=document.getElementById('calcExpr');
+  if(v) v.textContent=val;
+  if(e) e.textContent=expr||'';
+}
+
+function cPress(v){
+  if(v==='C'){calcExpr='';calcVal='0';calcNewNum=true;}
+  else if(v==='⌫'){calcVal=calcVal.length>1?calcVal.slice(0,-1):'0';}
+  else if(v==='='){
+    try{
+      let expr=calcExpr+calcVal;
+      // Replace display symbols
+      expr=expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/\^/g,'**');
+      const result=Function('"use strict";return ('+expr+')')();
+      calcExpr='';
+      calcVal=parseFloat(result.toFixed(10)).toString();
+      calcNewNum=true;
+    }catch{calcVal='Error';calcNewNum=true;}
+  }
+  else if(['+','-','×','÷','%','^'].includes(v)){
+    calcExpr+=calcVal+v;calcVal='0';calcNewNum=true;
+  }
+  else if(v==='+/-'){calcVal=(parseFloat(calcVal)*-1).toString();}
+  else if(v==='.'){if(!calcVal.includes('.'))calcVal+='.'; calcNewNum=false;}
+  else{
+    if(calcNewNum||calcVal==='0'){calcVal=v;calcNewNum=false;}
+    else calcVal+=v;
+  }
+  calcDisplay(calcVal,calcExpr);
+}
+
+function cFn(fn){
+  let n=parseFloat(calcVal);
+  let r;
+  if(fn==='sin') r=Math.sin(n*Math.PI/180);
+  else if(fn==='cos') r=Math.cos(n*Math.PI/180);
+  else if(fn==='tan') r=Math.tan(n*Math.PI/180);
+  else if(fn==='asin') r=Math.asin(n)*180/Math.PI;
+  else if(fn==='acos') r=Math.acos(n)*180/Math.PI;
+  else if(fn==='atan') r=Math.atan(n)*180/Math.PI;
+  else if(fn==='log') r=Math.log10(n);
+  else if(fn==='ln') r=Math.log(n);
+  else if(fn==='sqrt') r=Math.sqrt(n);
+  else if(fn==='cbrt') r=Math.cbrt(n);
+  else if(fn==='x2') r=n*n;
+  else if(fn==='x3') r=n*n*n;
+  else if(fn==='1/x') r=1/n;
+  else if(fn==='n!'){let f=1;for(let i=2;i<=n;i++)f*=i;r=f;}
+  else if(fn==='pi'){calcVal=Math.PI.toString();calcNewNum=true;calcDisplay(calcVal,calcExpr);return;}
+  else if(fn==='e'){calcVal=Math.E.toString();calcNewNum=true;calcDisplay(calcVal,calcExpr);return;}
+  else if(fn==='exp10') r=Math.pow(10,n);
+  else if(fn==='abs') r=Math.abs(n);
+  calcVal=parseFloat(r.toFixed(10)).toString();
+  calcNewNum=true;
+  calcDisplay(calcVal,calcExpr);
+}
+
+function buildSimpleCalc(){
+  return `<div class='calc-display'><div class='calc-expr' id='calcExpr'></div><div class='calc-val' id='calcVal'>0</div></div>
+  <div class='calc-grid calc-grid-4'>
+    <button class='cb cb-clear' onclick="cPress('C')">C</button>
+    <button class='cb cb-fn' onclick="cPress('+/-')">+/-</button>
+    <button class='cb cb-fn' onclick="cPress('%')">%</button>
+    <button class='cb cb-op' onclick="cPress('÷')">÷</button>
+    <button class='cb cb-num' onclick="cPress('7')">7</button>
+    <button class='cb cb-num' onclick="cPress('8')">8</button>
+    <button class='cb cb-num' onclick="cPress('9')">9</button>
+    <button class='cb cb-op' onclick="cPress('×')">×</button>
+    <button class='cb cb-num' onclick="cPress('4')">4</button>
+    <button class='cb cb-num' onclick="cPress('5')">5</button>
+    <button class='cb cb-num' onclick="cPress('6')">6</button>
+    <button class='cb cb-op' onclick="cPress('-')">−</button>
+    <button class='cb cb-num' onclick="cPress('1')">1</button>
+    <button class='cb cb-num' onclick="cPress('2')">2</button>
+    <button class='cb cb-num' onclick="cPress('3')">3</button>
+    <button class='cb cb-op' onclick="cPress('+')">+</button>
+    <button class='cb cb-num cb-zero' onclick="cPress('0')">0</button>
+    <button class='cb cb-num' onclick="cPress('.')">.</button>
+    <button class='cb cb-eq' onclick="cPress('=')">=</button>
+  </div>`;
+}
+
+function buildSciCalc(){
+  return `<div class='calc-display'><div class='calc-expr' id='calcExpr'></div><div class='calc-val' id='calcVal'>0</div></div>
+  <div class='calc-grid calc-grid-5' style='margin-bottom:8px'>
+    <button class='cb cb-fn' onclick="cFn('sin')">sin</button>
+    <button class='cb cb-fn' onclick="cFn('cos')">cos</button>
+    <button class='cb cb-fn' onclick="cFn('tan')">tan</button>
+    <button class='cb cb-fn' onclick="cFn('log')">log</button>
+    <button class='cb cb-fn' onclick="cFn('ln')">ln</button>
+    <button class='cb cb-fn' onclick="cFn('asin')">sin⁻¹</button>
+    <button class='cb cb-fn' onclick="cFn('acos')">cos⁻¹</button>
+    <button class='cb cb-fn' onclick="cFn('atan')">tan⁻¹</button>
+    <button class='cb cb-fn' onclick="cFn('sqrt')">√</button>
+    <button class='cb cb-fn' onclick="cFn('x2')">x²</button>
+    <button class='cb cb-fn' onclick="cFn('x3')">x³</button>
+    <button class='cb cb-fn' onclick="cPress('^')">xʸ</button>
+    <button class='cb cb-fn' onclick="cFn('n!')">n!</button>
+    <button class='cb cb-fn' onclick="cFn('1/x')">1/x</button>
+    <button class='cb cb-fn' onclick="cFn('pi')">π</button>
+  </div>
+  <div class='calc-grid calc-grid-4'>
+    <button class='cb cb-clear' onclick="cPress('C')">C</button>
+    <button class='cb cb-fn' onclick="cPress('⌫')">⌫</button>
+    <button class='cb cb-op' onclick="cPress('%')">%</button>
+    <button class='cb cb-op' onclick="cPress('÷')">÷</button>
+    <button class='cb cb-num' onclick="cPress('7')">7</button>
+    <button class='cb cb-num' onclick="cPress('8')">8</button>
+    <button class='cb cb-num' onclick="cPress('9')">9</button>
+    <button class='cb cb-op' onclick="cPress('×')">×</button>
+    <button class='cb cb-num' onclick="cPress('4')">4</button>
+    <button class='cb cb-num' onclick="cPress('5')">5</button>
+    <button class='cb cb-num' onclick="cPress('6')">6</button>
+    <button class='cb cb-op' onclick="cPress('-')">−</button>
+    <button class='cb cb-num' onclick="cPress('1')">1</button>
+    <button class='cb cb-num' onclick="cPress('2')">2</button>
+    <button class='cb cb-num' onclick="cPress('3')">3</button>
+    <button class='cb cb-op' onclick="cPress('+')">+</button>
+    <button class='cb cb-num cb-zero' onclick="cPress('0')">0</button>
+    <button class='cb cb-num' onclick="cPress('.')">.</button>
+    <button class='cb cb-eq' onclick="cPress('=')">=</button>
+  </div>`;
+}
+
+function buildEngCalc(){
+  return `<div class='calc-display'><div class='calc-expr' id='calcExpr'></div><div class='calc-val' id='calcVal'>0</div></div>
+  <div class='calc-grid calc-grid-5' style='margin-bottom:8px'>
+    <button class='cb cb-fn' onclick="cFn('sin')">sin</button>
+    <button class='cb cb-fn' onclick="cFn('cos')">cos</button>
+    <button class='cb cb-fn' onclick="cFn('tan')">tan</button>
+    <button class='cb cb-fn' onclick="cFn('log')">log</button>
+    <button class='cb cb-fn' onclick="cFn('ln')">ln</button>
+    <button class='cb cb-fn' onclick="cFn('sqrt')">√x</button>
+    <button class='cb cb-fn' onclick="cFn('cbrt')">∛x</button>
+    <button class='cb cb-fn' onclick="cFn('x2')">x²</button>
+    <button class='cb cb-fn' onclick="cPress('^')">xʸ</button>
+    <button class='cb cb-fn' onclick="cFn('exp10')">10ˣ</button>
+    <button class='cb cb-fn' onclick="cFn('abs')">|x|</button>
+    <button class='cb cb-fn' onclick="cFn('n!')">n!</button>
+    <button class='cb cb-fn' onclick="cFn('pi')">π</button>
+    <button class='cb cb-fn' onclick="cFn('e')">e</button>
+    <button class='cb cb-fn' onclick="cFn('1/x')">1/x</button>
+  </div>
+  <div class='calc-grid calc-grid-4'>
+    <button class='cb cb-clear' onclick="cPress('C')">C</button>
+    <button class='cb cb-fn' onclick="cPress('⌫')">⌫</button>
+    <button class='cb cb-op' onclick="cPress('%')">%</button>
+    <button class='cb cb-op' onclick="cPress('÷')">÷</button>
+    <button class='cb cb-num' onclick="cPress('7')">7</button>
+    <button class='cb cb-num' onclick="cPress('8')">8</button>
+    <button class='cb cb-num' onclick="cPress('9')">9</button>
+    <button class='cb cb-op' onclick="cPress('×')">×</button>
+    <button class='cb cb-num' onclick="cPress('4')">4</button>
+    <button class='cb cb-num' onclick="cPress('5')">5</button>
+    <button class='cb cb-num' onclick="cPress('6')">6</button>
+    <button class='cb cb-op' onclick="cPress('-')">−</button>
+    <button class='cb cb-num' onclick="cPress('1')">1</button>
+    <button class='cb cb-num' onclick="cPress('2')">2</button>
+    <button class='cb cb-num' onclick="cPress('3')">3</button>
+    <button class='cb cb-op' onclick="cPress('+')">+</button>
+    <button class='cb cb-num cb-zero' onclick="cPress('0')">0</button>
+    <button class='cb cb-num' onclick="cPress('.')">.</button>
+    <button class='cb cb-eq' onclick="cPress('=')">=</button>
+  </div>
+
+  <div style='margin-top:20px;border-top:1px solid var(--border);padding-top:16px'>
+    <div class='field-label' style='margin-bottom:12px'>∫ Numerical Integration (Simpson's Rule)</div>
+    <p style='font-size:12px;color:var(--muted);margin-bottom:10px'>Enter a function of x, limits a and b, and number of steps.</p>
+    <div style='display:grid;grid-template-columns:1fr;gap:8px'>
+      <input class='ks-input' id='intFn' placeholder='Function of x — e.g. x*x or Math.sin(x)'>
+      <div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px'>
+        <input class='ks-input' id='intA' placeholder='a (lower)' type='number'>
+        <input class='ks-input' id='intB' placeholder='b (upper)' type='number'>
+        <input class='ks-input' id='intN' placeholder='Steps (even)' type='number' value='100'>
+      </div>
+      <button class='btn btn-primary' onclick='doIntegrate()'>Integrate ∫</button>
+    </div>
+    <div class='pct-result' id='intResult' style='margin-top:10px'>—</div>
+  </div>
+
+  <div style='margin-top:20px;border-top:1px solid var(--border);padding-top:16px'>
+    <div class='field-label' style='margin-bottom:12px'>d/dx Numerical Differentiation</div>
+    <p style='font-size:12px;color:var(--muted);margin-bottom:10px'>Find the derivative of f(x) at a specific point x.</p>
+    <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px'>
+      <input class='ks-input' id='diffFn' placeholder='Function — e.g. x*x*x'>
+      <input class='ks-input' id='diffX' placeholder='Value of x' type='number'>
+    </div>
+    <button class='btn btn-primary' style='margin-top:8px;width:100%' onclick='doDiff()'>Differentiate d/dx</button>
+    <div class='pct-result' id='diffResult' style='margin-top:10px'>—</div>
+  </div>
+
+  <div style='margin-top:20px;border-top:1px solid var(--border);padding-top:16px'>
+    <div class='field-label' style='margin-bottom:12px'>▦ 2×2 Matrix Operations</div>
+    <p style='font-size:12px;color:var(--muted);margin-bottom:10px'>Enter two 2×2 matrices and choose an operation.</p>
+    <div style='display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px'>
+      <div>
+        <div style='font-size:12px;color:var(--muted);margin-bottom:6px'>Matrix A</div>
+        <div style='display:grid;grid-template-columns:1fr 1fr;gap:6px'>
+          <input class='ks-input' id='ma1' placeholder='a' type='number'>
+          <input class='ks-input' id='ma2' placeholder='b' type='number'>
+          <input class='ks-input' id='ma3' placeholder='c' type='number'>
+          <input class='ks-input' id='ma4' placeholder='d' type='number'>
+        </div>
+      </div>
+      <div>
+        <div style='font-size:12px;color:var(--muted);margin-bottom:6px'>Matrix B</div>
+        <div style='display:grid;grid-template-columns:1fr 1fr;gap:6px'>
+          <input class='ks-input' id='mb1' placeholder='a' type='number'>
+          <input class='ks-input' id='mb2' placeholder='b' type='number'>
+          <input class='ks-input' id='mb3' placeholder='c' type='number'>
+          <input class='ks-input' id='mb4' placeholder='d' type='number'>
+        </div>
+      </div>
+    </div>
+    <div style='display:flex;flex-wrap:wrap;gap:8px'>
+      <button class='btn btn-primary' style='flex:1;min-width:100px' onclick='doMatrix("add")'>A + B</button>
+      <button class='btn btn-primary' style='flex:1;min-width:100px' onclick='doMatrix("sub")'>A − B</button>
+      <button class='btn btn-primary' style='flex:1;min-width:100px' onclick='doMatrix("mul")'>A × B</button>
+      <button class='btn btn-primary' style='flex:1;min-width:100px' onclick='doMatrix("detA")'>det(A)</button>
+      <button class='btn btn-primary' style='flex:1;min-width:100px' onclick='doMatrix("invA")'>A⁻¹</button>
+    </div>
+    <div class='pct-result' id='matResult' style='margin-top:10px;font-family:Rajdhani,sans-serif;font-size:1rem;text-align:left;white-space:pre'>—</div>
+  </div>`;
+}
+
+function doIntegrate(){
+  try{
+    const fnStr=document.getElementById('intFn').value;
+    const a=parseFloat(document.getElementById('intA').value);
+    const b=parseFloat(document.getElementById('intB').value);
+    let n=parseInt(document.getElementById('intN').value)||100;
+    if(n%2!==0) n++;
+    if(!fnStr||isNaN(a)||isNaN(b)){document.getElementById('intResult').textContent='Fill all fields';return;}
+    const f=new Function('x','"use strict";return '+fnStr);
+    const h=(b-a)/n;
+    let sum=f(a)+f(b);
+    for(let i=1;i<n;i++) sum+=(i%2===0?2:4)*f(a+i*h);
+    const result=(h/3)*sum;
+    document.getElementById('intResult').textContent='∫ Result ≈ '+parseFloat(result.toFixed(10));
+  }catch{document.getElementById('intResult').textContent='Invalid function — use valid JS math e.g. x*x or Math.sin(x)';}
+}
+
+function doDiff(){
+  try{
+    const fnStr=document.getElementById('diffFn').value;
+    const x=parseFloat(document.getElementById('diffX').value);
+    if(!fnStr||isNaN(x)){document.getElementById('diffResult').textContent='Fill all fields';return;}
+    const f=new Function('x','"use strict";return '+fnStr);
+    const h=1e-7;
+    const result=(f(x+h)-f(x-h))/(2*h);
+    document.getElementById('diffResult').textContent="f'("+x+") ≈ "+parseFloat(result.toFixed(10));
+  }catch{document.getElementById('diffResult').textContent='Invalid function — use valid JS math e.g. x*x*x';}
+}
+
+function doMatrix(op){
+  const v=id=>parseFloat(document.getElementById(id).value)||0;
+  const A=[[v('ma1'),v('ma2')],[v('ma3'),v('ma4')]];
+  const B=[[v('mb1'),v('mb2')],[v('mb3'),v('mb4')]];
+  const el=document.getElementById('matResult');
+  function fmt(m){return '['+m[0][0].toFixed(3)+',  '+m[0][1].toFixed(3)+']\n['+m[1][0].toFixed(3)+',  '+m[1][1].toFixed(3)+']';}
+  if(op==='add') el.textContent=fmt([[A[0][0]+B[0][0],A[0][1]+B[0][1]],[A[1][0]+B[1][0],A[1][1]+B[1][1]]]);
+  else if(op==='sub') el.textContent=fmt([[A[0][0]-B[0][0],A[0][1]-B[0][1]],[A[1][0]-B[1][0],A[1][1]-B[1][1]]]);
+  else if(op==='mul') el.textContent=fmt([
+    [A[0][0]*B[0][0]+A[0][1]*B[1][0], A[0][0]*B[0][1]+A[0][1]*B[1][1]],
+    [A[1][0]*B[0][0]+A[1][1]*B[1][0], A[1][0]*B[0][1]+A[1][1]*B[1][1]]
+  ]);
+  else if(op==='detA'){const d=A[0][0]*A[1][1]-A[0][1]*A[1][0];el.textContent='det(A) = '+d.toFixed(6);}
+  else if(op==='invA'){
+    const d=A[0][0]*A[1][1]-A[0][1]*A[1][0];
+    if(Math.abs(d)<1e-10){el.textContent='Matrix A is singular (no inverse)';return;}
+    el.textContent=fmt([[A[1][1]/d,-A[0][1]/d],[-A[1][0]/d,A[0][0]/d]]);
+  }
+}
+
+
+function buildPctCalc(){
+  return `<div class='pct-row'>
+    <div>
+      <div class='pct-label'>📌 What is X% of Y?</div>
+      <div style='display:flex;gap:8px;align-items:center'>
+        <input class='ks-input' id='pct1a' placeholder='X (%)' type='number' style='flex:1'>
+        <span style='color:var(--muted)'>% of</span>
+        <input class='ks-input' id='pct1b' placeholder='Y' type='number' style='flex:1'>
+        <button class='btn btn-primary' style='flex:0 0 auto;padding:12px 16px' onclick='calcPct1()'>Go</button>
+      </div>
+      <div class='pct-result' id='pct1r'>—</div>
+    </div>
+    <div>
+      <div class='pct-label'>📈 % Change from A to B?</div>
+      <div style='display:flex;gap:8px;align-items:center'>
+        <input class='ks-input' id='pct2a' placeholder='From' type='number' style='flex:1'>
+        <span style='color:var(--muted)'>→</span>
+        <input class='ks-input' id='pct2b' placeholder='To' type='number' style='flex:1'>
+        <button class='btn btn-primary' style='flex:0 0 auto;padding:12px 16px' onclick='calcPct2()'>Go</button>
+      </div>
+      <div class='pct-result' id='pct2r'>—</div>
+    </div>
+    <div>
+      <div class='pct-label'>🔁 X is what % of Y?</div>
+      <div style='display:flex;gap:8px;align-items:center'>
+        <input class='ks-input' id='pct3a' placeholder='X' type='number' style='flex:1'>
+        <span style='color:var(--muted)'>of</span>
+        <input class='ks-input' id='pct3b' placeholder='Y' type='number' style='flex:1'>
+        <button class='btn btn-primary' style='flex:0 0 auto;padding:12px 16px' onclick='calcPct3()'>Go</button>
+      </div>
+      <div class='pct-result' id='pct3r'>—</div>
+    </div>
+    <div>
+      <div class='pct-label'>🔍 X% of what number = Y?</div>
+      <div style='display:flex;gap:8px;align-items:center'>
+        <input class='ks-input' id='pct4a' placeholder='X (%)' type='number' style='flex:1'>
+        <span style='color:var(--muted)'>% of ? =</span>
+        <input class='ks-input' id='pct4b' placeholder='Y' type='number' style='flex:1'>
+        <button class='btn btn-primary' style='flex:0 0 auto;padding:12px 16px' onclick='calcPct4()'>Go</button>
+      </div>
+      <div class='pct-result' id='pct4r'>—</div>
+    </div>
+  </div>`;
+}
+function calcPct1(){const a=parseFloat(pct1a.value),b=parseFloat(pct1b.value);pct1r.textContent=(!isNaN(a)&&!isNaN(b))?((a/100)*b).toFixed(4):'Enter valid numbers';}
+function calcPct2(){const a=parseFloat(pct2a.value),b=parseFloat(pct2b.value);pct2r.textContent=(!isNaN(a)&&!isNaN(b)&&a!==0)?(((b-a)/Math.abs(a))*100).toFixed(4)+'%':'Enter valid numbers';}
+function calcPct3(){const a=parseFloat(pct3a.value),b=parseFloat(pct3b.value);pct3r.textContent=(!isNaN(a)&&!isNaN(b)&&b!==0)?((a/b)*100).toFixed(4)+'%':'Enter valid numbers';}
+function calcPct4(){const a=parseFloat(pct4a.value),b=parseFloat(pct4b.value);pct4r.textContent=(!isNaN(a)&&!isNaN(b)&&a!==0)?(b/(a/100)).toFixed(4):'Enter valid numbers';}
+
+function buildFinCalc(){
+  return `<div class='pct-row'>
+    <div>
+      <div class='pct-label'>💰 Simple Interest</div>
+      <div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px'>
+        <input class='ks-input' id='siP' placeholder='Principal (₹)' type='number'>
+        <input class='ks-input' id='siR' placeholder='Rate (%/yr)' type='number'>
+        <input class='ks-input' id='siT' placeholder='Time (years)' type='number'>
+      </div>
+      <button class='btn btn-primary' style='margin-top:8px;width:100%' onclick='calcSI()'>Calculate SI</button>
+      <div class='pct-result' id='siResult'>—</div>
+    </div>
+    <div>
+      <div class='pct-label'>📈 Compound Interest</div>
+      <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px'>
+        <input class='ks-input' id='ciP' placeholder='Principal (₹)' type='number'>
+        <input class='ks-input' id='ciR' placeholder='Rate (%/yr)' type='number'>
+        <input class='ks-input' id='ciT' placeholder='Time (years)' type='number'>
+        <input class='ks-input' id='ciN' placeholder='Compounding/yr' type='number' value='12'>
+      </div>
+      <button class='btn btn-primary' style='margin-top:8px;width:100%' onclick='calcCI()'>Calculate CI</button>
+      <div class='pct-result' id='ciResult'>—</div>
+    </div>
+    <div>
+      <div class='pct-label'>💸 Discount Calculator</div>
+      <div style='display:flex;gap:8px'>
+        <input class='ks-input' id='discP' placeholder='Original Price' type='number' style='flex:1'>
+        <input class='ks-input' id='discR' placeholder='Discount %' type='number' style='flex:1'>
+      </div>
+      <button class='btn btn-primary' style='margin-top:8px;width:100%' onclick='calcDisc()'>Calculate</button>
+      <div class='pct-result' id='discResult'>—</div>
+    </div>
+  </div>`;
+}
+function calcSI(){
+  const p=parseFloat(siP.value),r=parseFloat(siR.value),t=parseFloat(siT.value);
+  if(isNaN(p)||isNaN(r)||isNaN(t)){siResult.textContent='Enter all values';return;}
+  const si=(p*r*t)/100;
+  siResult.innerHTML=`SI = ₹${si.toFixed(2)} &nbsp;|&nbsp; Total = ₹${(p+si).toFixed(2)}`;
+}
+function calcCI(){
+  const p=parseFloat(ciP.value),r=parseFloat(ciR.value),t=parseFloat(ciT.value),n=parseFloat(ciN.value)||12;
+  if(isNaN(p)||isNaN(r)||isNaN(t)){ciResult.textContent='Enter all values';return;}
+  const amount=p*Math.pow((1+(r/100)/n),n*t);
+  ciResult.innerHTML=`CI = ₹${(amount-p).toFixed(2)} &nbsp;|&nbsp; Total = ₹${amount.toFixed(2)}`;
+}
+function calcDisc(){
+  const p=parseFloat(discP.value),r=parseFloat(discR.value);
+  if(isNaN(p)||isNaN(r)){discResult.textContent='Enter valid values';return;}
+  const save=p*(r/100);
+  discResult.innerHTML=`Save ₹${save.toFixed(2)} &nbsp;|&nbsp; Pay ₹${(p-save).toFixed(2)}`;
+}
+
+/* ═══════════════════════════════════════
+   NUMBER TO WORDS HUB
+═══════════════════════════════════════ */
+function renderNumWords(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('apps')">← Apps</button></div>
+    <div class='inner-card'>
+      <h2>🔤 Number Converter Hub</h2>
+      <p class='subtitle'>Convert numbers every possible way — words, Roman, and back.</p>
+      <div style='display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px' id='nwTabs'>
+        <button class='calc-tab active' onclick='switchNW("n2w",this)'>Number → Words</button>
+        <button class='calc-tab' onclick='switchNW("w2n",this)'>Words → Number</button>
+        <button class='calc-tab' onclick='switchNW("n2r",this)'>Number → Roman</button>
+        <button class='calc-tab' onclick='switchNW("r2n",this)'>Roman → Number</button>
+      </div>
+      <div id='nwBody'></div>
+      ${appFooter('numwords')}
+    </div>
+  </div>`;
+  if(!document.getElementById('calcHubStyle')) renderCalcHub();
+  switchNW('n2w', document.querySelector('.calc-tab'));
+}
+
+function switchNW(mode, btn){
+  document.querySelectorAll('.calc-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const body=document.getElementById('nwBody');
+  if(mode==='n2w') body.innerHTML=`
+    <label class='field-label'>Enter a Number</label>
+    <input class='ks-input' id='nwInput' type='number' placeholder='e.g. 42000'>
+    <button class='btn btn-primary' style='margin-top:10px' onclick='doN2W()'>Convert to Words</button>
+    <div class='pct-result' id='nwResult' style='margin-top:12px;text-align:left;font-size:1.1rem;line-height:1.6'>—</div>`;
+  else if(mode==='w2n') body.innerHTML=`
+    <label class='field-label'>Enter Number in Words</label>
+    <input class='ks-input' id='nwInput' placeholder='e.g. forty two thousand'>
+    <button class='btn btn-primary' style='margin-top:10px' onclick='doW2N()'>Convert to Number</button>
+    <div class='pct-result' id='nwResult' style='margin-top:12px'>—</div>`;
+  else if(mode==='n2r') body.innerHTML=`
+    <label class='field-label'>Enter a Number (1 – 3999)</label>
+    <input class='ks-input' id='nwInput' type='number' placeholder='e.g. 42' min='1' max='3999'>
+    <button class='btn btn-primary' style='margin-top:10px' onclick='doN2R()'>Convert to Roman</button>
+    <div class='pct-result' id='nwResult' style='margin-top:12px;font-size:1.6rem;letter-spacing:2px'>—</div>`;
+  else if(mode==='r2n') body.innerHTML=`
+    <label class='field-label'>Enter Roman Numerals</label>
+    <input class='ks-input' id='nwInput' placeholder='e.g. XLII' style='text-transform:uppercase'>
+    <button class='btn btn-primary' style='margin-top:10px' onclick='doR2N()'>Convert to Number</button>
+    <div class='pct-result' id='nwResult' style='margin-top:12px'>—</div>`;
+}
+
+function numToWords(n){
+  if(n===0) return 'zero';
+  if(n<0) return 'negative '+numToWords(-n);
+  const ones=['','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+  const tens=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+  function helper(num){
+    if(num===0) return '';
+    if(num<20) return ones[num]+' ';
+    if(num<100) return tens[Math.floor(num/10)]+' '+(num%10?ones[num%10]+' ':'');
+    if(num<1000) return ones[Math.floor(num/100)]+' hundred '+(num%100?helper(num%100):'');
+    if(num<1000000) return helper(Math.floor(num/1000))+'thousand '+(num%1000?helper(num%1000):'');
+    if(num<1000000000) return helper(Math.floor(num/1000000))+'million '+(num%1000000?helper(num%1000000):'');
+    return helper(Math.floor(num/1000000000))+'billion '+(num%1000000000?helper(num%1000000000):'');
+  }
+  return helper(n).trim();
+}
+
+function wordsToNum(str){
+  const w=str.toLowerCase().trim();
+  const ones={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19};
+  const tens={twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
+  const mults={hundred:100,thousand:1000,million:1000000,billion:1000000000};
+  let current=0,result=0;
+  const words=w.split(/\s+/);
+  for(const word of words){
+    if(ones[word]!==undefined) current+=ones[word];
+    else if(tens[word]!==undefined) current+=tens[word];
+    else if(word==='hundred') current*=100;
+    else if(mults[word]){
+      if(word!=='hundred'){result+=(current||1)*mults[word];current=0;}
+    }
+  }
+  return result+current;
+}
+
+function toRoman(n){
+  const vals=[1000,900,500,400,100,90,50,40,10,9,5,4,1];
+  const syms=['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I'];
+  let r='';
+  for(let i=0;i<vals.length;i++){while(n>=vals[i]){r+=syms[i];n-=vals[i];}}
+  return r;
+}
+
+function fromRoman(s){
+  const map={I:1,V:5,X:10,L:50,C:100,D:500,M:1000};
+  let r=0;
+  for(let i=0;i<s.length;i++){
+    const cur=map[s[i]],nxt=map[s[i+1]];
+    if(nxt&&cur<nxt){r-=cur;}else r+=cur;
+  }
+  return r;
+}
+
+function doN2W(){
+  const n=parseInt(document.getElementById('nwInput').value);
+  document.getElementById('nwResult').textContent=isNaN(n)?'Enter a valid number':numToWords(n);
+}
+function doW2N(){
+  const s=document.getElementById('nwInput').value;
+  if(!s.trim()){document.getElementById('nwResult').textContent='Enter words';return;}
+  const r=wordsToNum(s);
+  document.getElementById('nwResult').textContent=r||'Could not parse — try e.g. "forty two thousand"';
+}
+function doN2R(){
+  const n=parseInt(document.getElementById('nwInput').value);
+  if(isNaN(n)||n<1||n>3999){document.getElementById('nwResult').textContent='Enter a number between 1 and 3999';return;}
+  document.getElementById('nwResult').textContent=toRoman(n);
+}
+function doR2N(){
+  const s=document.getElementById('nwInput').value.toUpperCase().trim();
+  if(!s){document.getElementById('nwResult').textContent='Enter Roman numerals';return;}
+  const r=fromRoman(s);
+  document.getElementById('nwResult').textContent=r?r+' ('+numToWords(r)+')':'Invalid Roman numeral';
+}
+
 /* ── BOOT ── */
 renderHome();
 </script>
 </body>
 </html>
-      
