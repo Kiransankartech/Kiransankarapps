@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>KS Tech — Apps by Kiran Sankar</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 /* ── TOKENS ── */
 :root{
@@ -35,6 +35,37 @@
   --muted:    #5A6380;
   --sub:      #9AA0B8;
   --card-shadow: 0 8px 40px rgba(0,0,0,0.08);
+}
+
+/* ── NUMBER FONT ── */
+/* Apply Rajdhani to all numeric values site-wide */
+.num-font,
+.stat-num,
+#ageDisplay,
+#swDisplay,
+#cdDisplay,
+.day-big,
+.nbr-day,
+.score-num,
+.verdict-lbl,
+.day-date-lbl,
+#tpTime, #tpAcc, #tpWpm {
+  font-family: 'Rajdhani', sans-serif !important;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+}
+
+/* Target strong tags inside result boxes — where all calculated values appear */
+.result-box strong,
+.who-table strong,
+.day-big,
+.nbr-day,
+.score-chip .score-num,
+#swDisplay,
+#cdDisplay,
+#tpTime, #tpAcc, #tpWpm {
+  font-family: 'Rajdhani', sans-serif !important;
+  font-weight: 500;
 }
 
 /* ── RESET ── */
@@ -806,7 +837,9 @@ function parseDOBParts(){
     dobHelp.style.display='block';
     [dobDD,dobMM,dobYY].forEach(i=>i.classList.add('err'));return null;
   }
-  const test=new Date(yy,mm-1,dd);
+  // Use setFullYear to correctly handle years 1-99 (JS Date quirk)
+  const test=new Date(0);
+  test.setFullYear(yy, mm-1, dd);
   if(test.getFullYear()!==yy||test.getMonth()!==mm-1||test.getDate()!==dd){
     dobHelp.style.display='block';
     [dobDD,dobMM,dobYY].forEach(i=>i.classList.add('err'));return null;
@@ -824,7 +857,10 @@ function ageBreakdown(ms){
   const s=Math.floor(diff/1000);
   return {y,mo,d,h,mi,s};
 }
-function fmtAge(b){return `${b.y} yrs &nbsp; ${b.mo} Mo &nbsp; ${b.d} days &nbsp; ${b.h} hrs &nbsp; ${b.mi} min &nbsp; ${b.s} sec`;}
+function fmtAge(b){
+  const u=(n,label)=>`<span style='font-family:Rajdhani, sans-serif;font-weight:600'>${n}</span><span style='font-family:Rajdhani, sans-serif;font-size:0.65em;font-weight:400;opacity:0.75;margin-left:3px'>${label}</span>`;
+  return `${u(b.y,'yrs')} &nbsp; ${u(b.mo,'Mo')} &nbsp; ${u(b.d,'days')} &nbsp; ${u(b.h,'hrs')} &nbsp; ${u(b.mi,'min')} &nbsp; ${u(b.s,'sec')}`;
+}
 function fmtDateFull(date){
   const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -1557,3 +1593,4 @@ renderHome();
 </script>
 </body>
 </html>
+      
