@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8"/>
@@ -35,6 +35,39 @@
   --muted:    #5A6380;
   --sub:      #9AA0B8;
   --card-shadow: 0 8px 40px rgba(0,0,0,0.08);
+}
+
+/* ── DIFFICULTY / MODE TABS ── */
+.calc-tab{
+  position:relative;padding:10px 18px;border-radius:12px;
+  border:1.5px solid var(--border);
+  background:linear-gradient(135deg,#0f1524,#0a0c14);
+  color:var(--muted);cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  transition:all .2s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 2px 8px rgba(0,0,0,.3);
+  overflow:hidden;
+  text-align:center;
+  line-height:1.4;
+}
+.calc-tab:hover{
+  border-color:rgba(245,166,35,0.45);
+  color:var(--text);
+  transform:translateY(-1px);
+  box-shadow:0 4px 18px rgba(0,0,0,.4);
+}
+.calc-tab:active{transform:scale(.94) translateY(0) !important;}
+.calc-tab.active{
+  background:linear-gradient(135deg,#7a3e00,#3d1f00);
+  border-color:var(--accent);
+  color:var(--accent);
+  box-shadow:0 0 18px rgba(245,166,35,0.28),0 2px 8px rgba(0,0,0,.5);
+  font-weight:700;
+}
+.calc-tab.active::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  border-radius:2px 2px 0 0;
 }
 
 /* ── NUMBER FONT ── */
@@ -89,51 +122,182 @@ body{
   position:fixed;top:0;left:0;right:0;z-index:100;
   display:flex;align-items:center;justify-content:space-between;
   padding:0 32px;height:64px;
-  background:rgba(10,12,20,0.7);
+  background:rgba(10,12,20,0.75);
   backdrop-filter:blur(18px);
   border-bottom:1px solid var(--border);
   transition:background .35s,border-color .35s;
+  gap:12px;
 }
-[data-theme="light"] .navbar{background:rgba(243,245,251,0.8);}
+[data-theme="light"] .navbar{background:rgba(243,245,251,0.85);}
+
+/* Logo */
+.nav-logo-wrap{
+  display:flex;flex-direction:column;justify-content:center;
+  cursor:pointer;gap:1px;flex-shrink:0;
+}
 .nav-logo{
-  font-family:'Syne',sans-serif;
-  font-weight:800;font-size:1.15rem;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;
   letter-spacing:-0.5px;
-  cursor:pointer;
   background:linear-gradient(135deg,var(--accent),#FF8C42);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.2;
 }
 .nav-logo span{color:var(--text);-webkit-text-fill-color:var(--text);}
-.nav-right{display:flex;align-items:center;gap:12px;}
+.nav-tagline{
+  font-size:10px;font-weight:600;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted);
+  font-family:'DM Sans',sans-serif;opacity:0.65;
+}
+
+/* Middle cycling tagline — mobile only */
+.nav-marquee-wrap{
+  flex:1;overflow:hidden;
+  display:none;
+  flex-direction:column;align-items:center;justify-content:center;
+  position:relative;height:100%;gap:5px;
+}
+@keyframes cycleTag{
+  0%{opacity:0;transform:translateY(5px);}
+  12%{opacity:1;transform:translateY(0);}
+  80%{opacity:1;transform:translateY(0);}
+  92%{opacity:0;transform:translateY(-5px);}
+  100%{opacity:0;transform:translateY(-5px);}
+}
+.nav-marquee-text{
+  font-size:10.5px;font-weight:600;letter-spacing:0.8px;
+  color:var(--muted);
+  font-family:'DM Sans',sans-serif;
+  white-space:nowrap;opacity:0;
+  text-align:center;
+}
+.nav-marquee-text.active{animation:cycleTag 3.5s ease forwards;}
+/* Glow underline */
+.nav-marquee-glow{
+  width:48px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  box-shadow:0 0 8px var(--accent-glow);
+  flex-shrink:0;
+}
+
+/* Desktop nav links */
+.nav-right{display:flex;align-items:center;gap:12px;flex-shrink:0;}
 .nav-link{
   font-size:14px;font-weight:500;color:var(--muted);
   cursor:pointer;padding:6px 12px;border-radius:8px;
   border:none;background:none;
   transition:color .2s,background .2s;
-  font-family:'DM Sans',sans-serif;
+  font-family:'DM Sans',sans-serif;white-space:nowrap;
 }
 .nav-link:hover{color:var(--text);background:var(--surface2);}
 
-/* theme toggle */
+/* Mobile right: grid-dots + theme toggle */
+.nav-mobile-right{
+  display:none;align-items:center;gap:8px;flex-shrink:0;
+}
+
+/* Rounded pill Menu button */
+.nav-grid-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:0 14px;height:36px;border-radius:100px;
+  background:var(--surface2);border:1px solid var(--border);
+  cursor:pointer;flex-shrink:0;
+  font-size:13px;font-weight:600;color:var(--muted);
+  font-family:'DM Sans',sans-serif;
+  transition:background .2s,border-color .2s,color .2s;
+  white-space:nowrap;
+  order:-1;
+}
+.nav-grid-btn:hover{background:var(--border);color:var(--text);}
+.nav-grid-btn.open{
+  background:rgba(61,82,213,0.15);
+  border-color:var(--accent);
+  color:var(--accent);
+}
+.nav-grid-btn-icon{font-size:14px;transition:transform .3s;}
+.nav-grid-btn.open .nav-grid-btn-icon{transform:rotate(90deg);}
+
+/* Mobile dropdown */
+@keyframes dropDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.nav-mobile-menu{
+  display:none;
+  position:fixed;top:64px;left:0;right:0;z-index:99;
+  max-height:calc(100dvh - 64px);
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  background:rgba(10,12,20,0.98);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  flex-direction:column;
+  padding:6px 12px 24px;
+}
+[data-theme="light"] .nav-mobile-menu{background:rgba(243,245,251,0.98);}
+.nav-mobile-menu.open{display:flex;animation:dropDown .22s ease;}
+
+.nav-mobile-section{
+  font-size:10px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted);
+  padding:14px 14px 5px;opacity:0.55;
+  font-family:'DM Sans',sans-serif;
+}
+.nav-mobile-link{
+  display:flex;align-items:center;gap:13px;
+  font-size:15px;font-weight:600;color:var(--text);
+  cursor:pointer;padding:12px 14px;border-radius:14px;
+  border:none;background:none;text-align:left;width:100%;
+  font-family:'DM Sans',sans-serif;
+  transition:background .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.nav-mobile-link:active,.nav-mobile-link:hover{background:var(--surface2);}
+.nav-mobile-icon{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.15rem;flex-shrink:0;
+}
+.nav-mobile-label{flex:1;}
+.nav-mobile-arrow{color:var(--muted);font-size:16px;opacity:0.4;}
+
+.nav-mobile-divider{height:1px;background:var(--border);margin:6px 14px;opacity:0.4;}
+
+.nav-mobile-social{display:flex;gap:10px;padding:8px 14px 4px;}
+.nav-mobile-social-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:12px 8px;border-radius:13px;
+  background:var(--surface2);border:1px solid var(--border);
+  font-size:13px;font-weight:600;color:var(--muted);
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+  transition:background .15s,color .15s,border-color .15s;
+  -webkit-tap-highlight-color:transparent;text-decoration:none;
+}
+.nav-mobile-social-btn:hover,.nav-mobile-social-btn:active{
+  background:rgba(61,82,213,0.15);border-color:var(--accent);color:var(--accent);
+}
+
+/* Theme toggle — shared */
 .theme-toggle{
   width:72px;height:36px;border-radius:18px;
   background:var(--surface2);border:1px solid var(--border);
-  cursor:pointer;position:relative;
-  transition:background .3s;
-  flex-shrink:0;
+  cursor:pointer;position:relative;transition:background .3s;flex-shrink:0;
 }
 .theme-toggle::after{
-  content:'';position:absolute;
-  top:4px;left:4px;
+  content:'';position:absolute;top:4px;left:4px;
   width:26px;height:26px;border-radius:50%;
-  background:var(--accent);
-  transition:transform .3s,background .3s;
+  background:var(--accent);transition:transform .3s,background .3s;
   box-shadow:0 0 10px var(--accent-glow);
 }
 [data-theme="light"] .theme-toggle::after{transform:translateX(36px);}
 .theme-icon{font-size:16px;position:absolute;top:50%;transform:translateY(-50%);pointer-events:none;}
 .theme-icon.moon{left:8px;}
 .theme-icon.sun{right:8px;}
+
+/* Mobile breakpoint */
+@media(max-width:640px){
+  .navbar{padding:0 16px;gap:8px;}
+  .nav-right{display:none;}
+  .nav-mobile-right{display:flex;}
+  .nav-marquee-wrap{display:flex;}
+}
 
 /* ── MAIN ── */
 #app{
@@ -501,6 +665,24 @@ footer strong{color:var(--accent);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 .reveal{animation:fadeUp .4s ease both;}
 
+/* ── HEALTH BUTTON STATES ── */
+@keyframes btnPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,166,35,0.5);}50%{box-shadow:0 0 0 10px rgba(245,166,35,0);}}
+@keyframes btnPulseGreen{0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,0.5);}50%{box-shadow:0 0 0 10px rgba(74,222,128,0);}}
+@keyframes tapPulse{0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,0.6);}50%{box-shadow:0 0 0 16px rgba(248,113,113,0);}}
+.btn-running{
+  background:linear-gradient(135deg,#1a4a1a,#0a2e0a) !important;
+  color:#4ade80 !important;
+  border:1.5px solid #4ade80 !important;
+  animation:btnPulseGreen 1.8s ease-in-out infinite;
+}
+.btn-paused{
+  background:linear-gradient(135deg,#2a2a0a,#1a1a00) !important;
+  color:#fbbf24 !important;
+  border:1.5px solid #fbbf24 !important;
+}
+.tap-btn-active{animation:tapPulse 1s ease-in-out infinite;}
+.tap-btn-idle{animation:none;opacity:0.5;pointer-events:none;}
+
 /* WHO table */
 .who-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:12px;}
 .who-table th{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);}
@@ -525,17 +707,83 @@ footer strong{color:var(--accent);}
 
 <!-- NAVBAR -->
 <nav class="navbar">
-  <div class="nav-logo" onclick="go('home')" style="cursor:pointer">KS<span style="-webkit-text-fill-color:inherit;color:inherit"> Tech</span></div>
+  <!-- Logo + tagline -->
+  <div class="nav-logo-wrap" onclick="go('home')">
+    <div class="nav-logo">KS<span style="-webkit-text-fill-color:inherit;color:inherit"> Tech</span></div>
+    <div class="nav-tagline">Free Tools · No Ads</div>
+  </div>
+
+  <!-- Middle cycling tagline — mobile only -->
+  <div class="nav-marquee-wrap" id="navMarquee">
+    <span class="nav-marquee-text" id="navMarqueeText"></span>
+    <div class="nav-marquee-glow"></div>
+  </div>
+
+  <!-- Desktop links -->
   <div class="nav-right">
     <button class="nav-link" onclick="go('home')">🏠 Home</button>
     <button class="nav-link" onclick="go('apps')">⚡ Apps</button>
+    <button class="nav-link" onclick="go('games')">🎮 Games</button>
+    <button class="nav-link" onclick="go('health')">🩺 Health</button>
     <button class="nav-link" onclick="scrollContact()">✉️ Contact</button>
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
       <span class="theme-icon moon">🌙</span>
       <span class="theme-icon sun">☀️</span>
     </button>
   </div>
+
+  <!-- Mobile right: grid-dots (LEFT) + theme toggle (RIGHT) -->
+  <div class="nav-mobile-right">
+    <button class="nav-grid-btn" id="navGridBtn" onclick="toggleMobileNav()" aria-label="Menu">
+      <span class="nav-grid-btn-icon">☰</span>
+      <span>Menu</span>
+    </button>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+      <span class="theme-icon moon">🌙</span>
+      <span class="theme-icon sun">☀️</span>
+    </button>
+  </div>
 </nav>
+
+<!-- Mobile dropdown menu -->
+<div class="nav-mobile-menu" id="navMobileMenu">
+  <div class="nav-mobile-section">Navigate</div>
+  <button class="nav-mobile-link" onclick="mobileGo('home')">
+    <div class="nav-mobile-icon">🏠</div>
+    <span class="nav-mobile-label">Home</span>
+    <span class="nav-mobile-arrow">›</span>
+  </button>
+  <button class="nav-mobile-link" onclick="mobileGo('apps')">
+    <div class="nav-mobile-icon">⚡</div>
+    <span class="nav-mobile-label">Apps</span>
+    <span class="nav-mobile-arrow">›</span>
+  </button>
+  <button class="nav-mobile-link" onclick="mobileGo('games')">
+    <div class="nav-mobile-icon">🎮</div>
+    <span class="nav-mobile-label">Games</span>
+    <span class="nav-mobile-arrow">›</span>
+  </button>
+  <button class="nav-mobile-link" onclick="mobileGo('health')">
+    <div class="nav-mobile-icon">🩺</div>
+    <span class="nav-mobile-label">Health Hub</span>
+    <span class="nav-mobile-arrow">›</span>
+  </button>
+  <button class="nav-mobile-link" onclick="mobileScrollContact()">
+    <div class="nav-mobile-icon">✉️</div>
+    <span class="nav-mobile-label">Contact</span>
+    <span class="nav-mobile-arrow">›</span>
+  </button>
+  <div class="nav-mobile-divider"></div>
+  <div class="nav-mobile-section">Connect</div>
+  <div class="nav-mobile-social">
+    <a class="nav-mobile-social-btn" href="https://instagram.com/kstech_official" target="_blank" rel="noopener">
+      📸 Instagram
+    </a>
+    <a class="nav-mobile-social-btn" href="mailto:contactkstech@gmail.com">
+      ✉️ Email
+    </a>
+  </div>
+</div>
 
 <div id="app"></div>
 
@@ -565,10 +813,38 @@ function toggleTheme(){
 /* ── ROUTER ── */
 const appEl=document.getElementById('app');
 function go(page){
-  clearInterval(ageTimer);clearTimeout(dayFinderTimer);
+  // Clear ALL app timers to prevent background leaks
+  clearInterval(ageTimer);
+  clearTimeout(dayFinderTimer);
+  clearInterval(snakeLoop);
+  clearInterval(memTimer);
+  clearInterval(typingTimer); typingStarted=false; typingDone=false;
+  clearInterval(swInterval); swRunning=false;
+  clearInterval(cdInterval); cdRunning=false;
+  // Health timers
+  clearInterval(breathInterval); breathInterval=null;
+  clearInterval(lungTimer); lungTimer=null; lungRunning=false; lungPaused=false;
+  clearInterval(brTimer); brTimer=null; brRunning=false; brPaused=false;
+  clearInterval(stressTimer); stressTimer=null; stressRunning=false;
+  clearInterval(eyeTimer); eyeTimer=null; eyeRunning=false;
+  document.onkeydown=null;
   appEl.innerHTML='';
-  if(page==='home')renderHome();
-  else if(page==='apps')renderAppList();
+  if(page==='home') renderHome();
+  else if(page==='apps') renderAppList();
+  else if(page==='games') renderGames();
+  else if(page==='ttt') renderTTT();
+  else if(page==='g2048') renderG2048();
+  else if(page==='memory') renderMemory();
+  else if(page==='snake') renderSnake();
+  else if(page==='health') renderHealth();
+  else if(page==='breath') renderBreath();
+  else if(page==='lunghold') renderLungHold();
+  else if(page==='breathrate') renderBreathRate();
+  else if(page==='heartrate') renderHeartRate();
+  else if(page==='heartzone') renderHeartZone();
+  else if(page==='stress') renderStress();
+  else if(page==='eyetimer') renderEyeTimer();
+  else if(page==='water') renderWater();
   else{const a=APPS.find(x=>x.id===page);if(a)a.render();else renderHome();}
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -591,7 +867,9 @@ const APPS=[
   {id:'timer',   icon:'⏱️', name:'Stopwatch & Timer',        desc:'Stopwatch with laps + countdown timer',   render:renderTimer},
   {id:'decision',icon:'🎲', name:'Random Decision Maker',    desc:"Spin to decide when you can't choose",    render:renderDecision},
   {id:'calchub',  icon:'🧮', name:'Calculator Hub',              desc:'Simple, Scientific, Engineering, Percentage & Financial — all in one', render:renderCalcHub},
-  {id:'numwords', icon:'🔤', name:'Number to Words',             desc:'Convert any number to words — perfect for cheques & docs', render:renderNumWords}
+  {id:'numwords', icon:'🔤', name:'Number to Words',             desc:'Convert any number to words — perfect for cheques & docs', render:renderNumWords},
+  {id:'morse',    icon:'📡', name:'Morse Code Converter',        desc:'Text ↔ Morse code with real beep sounds',                 render:renderMorse},
+  {id:'health',   icon:'🩺', name:'Health Hub',                  desc:'Breathing, heart rate, water, eye care & more',           render:renderHealth}
 ];
 
 /* ── ABOUT TEXTS ── */
@@ -609,7 +887,8 @@ const ABOUT={
   timer:    'A clean stopwatch with lap tracking and a countdown timer. Created by Kiran Sankar with the assistance of AI.',
   decision: "Can't decide? Enter your options and let the spinner choose for you. Created by Kiran Sankar with the assistance of AI.",
   calchub:  'The ultimate Calculator Hub — Simple, Scientific, Engineering, Percentage and Financial calculators all in one place. Created by Kiran Sankar with the assistance of AI.',
-  numwords: 'Convert numbers to words, words to numbers, numbers to Roman numerals and Roman numerals to numbers. Created by Kiran Sankar with the assistance of AI.'
+  numwords: 'Convert numbers to words, words to numbers, numbers to Roman numerals and Roman numerals to numbers. Created by Kiran Sankar with the assistance of AI.',
+  morse:    'Convert text to Morse code and Morse code back to text. Plays real beep sounds. Created by Kiran Sankar with the assistance of AI.'
 };
 
 function showAbout(id){
@@ -631,6 +910,47 @@ function scrollContact(){
     if(el)el.scrollIntoView({behavior:'smooth'});
   },200);
 }
+
+/* ── MOBILE NAV ── */
+function toggleMobileNav(){
+  const menu=document.getElementById('navMobileMenu');
+  const btn=document.getElementById('navGridBtn');
+  const isOpen=menu.classList.contains('open');
+  if(isOpen){ menu.classList.remove('open'); btn.classList.remove('open'); }
+  else { menu.classList.add('open'); btn.classList.add('open'); }
+}
+function closeMobileNav(){
+  const menu=document.getElementById('navMobileMenu');
+  const btn=document.getElementById('navGridBtn');
+  if(menu) menu.classList.remove('open');
+  if(btn) btn.classList.remove('open');
+}
+function mobileGo(page){ closeMobileNav(); go(page); }
+function mobileScrollContact(){
+  closeMobileNav();
+  scrollContact();
+}
+// Close menu when tapping outside
+document.addEventListener('click',function(e){
+  const menu=document.getElementById('navMobileMenu');
+  const btn=document.getElementById('navGridBtn');
+  if(menu&&menu.classList.contains('open')){
+    if(!menu.contains(e.target)&&(!btn||!btn.contains(e.target))) closeMobileNav();
+  }
+});
+
+/* ── CYCLING NAVBAR TAGLINE ── */
+const NAV_TAG='Free Tools · No Ads · Made by Kiran Sankar';
+function cycleNavTag(){
+  const el=document.getElementById('navMarqueeText');
+  if(!el) return;
+  el.classList.remove('active');
+  void el.offsetWidth; // reflow to restart animation
+  el.textContent=NAV_TAG;
+  el.classList.add('active');
+}
+cycleNavTag();
+setInterval(cycleNavTag, 3500);
 
 /* ── APP FOOTER ── */
 function appFooter(id){
@@ -654,7 +974,8 @@ function renderHome(){
       <button class='btn btn-ghost' onclick="scrollContact()">✉️ Get in Touch</button>
     </div>
     <div class='stat-strip'>
-      <div class='stat-item'><div class='stat-num'>14</div><div class='stat-lbl'>Apps Built</div></div>
+      <div class='stat-item'><div class='stat-num'>16</div><div class='stat-lbl'>Apps Built</div></div>
+      <div class='stat-item'><div class='stat-num'>4</div><div class='stat-lbl'>Games</div></div>
       <div class='stat-item'><div class='stat-num'>100%</div><div class='stat-lbl'>Free to Use</div></div>
       <div class='stat-item'><div class='stat-num'>0</div><div class='stat-lbl'>Data Stored</div></div>
       <div class='stat-item'><div class='stat-num'>∞</div><div class='stat-lbl'>Curiosity</div></div>
@@ -1640,8 +1961,39 @@ function renderCalcHub(){
     const s=document.createElement('style');
     s.id='calcHubStyle';
     s.textContent=`
-      .calc-tab{padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--bg2);color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;transition:all .2s;}
-      .calc-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+      .calc-tab{
+        position:relative;padding:10px 18px;border-radius:12px;
+        border:1.5px solid var(--border);
+        background:linear-gradient(135deg,#0f1524,#0a0c14);
+        color:var(--muted);cursor:pointer;
+        font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+        transition:all .2s cubic-bezier(.4,0,.2,1);
+        box-shadow:0 2px 8px rgba(0,0,0,.3);
+        overflow:hidden;
+      }
+      .calc-tab::after{
+        content:'';position:absolute;inset:0;
+        background:linear-gradient(135deg,rgba(245,166,35,0),rgba(245,166,35,0));
+        transition:background .2s;
+      }
+      .calc-tab:hover{
+        border-color:rgba(245,166,35,0.4);
+        color:var(--text);
+        transform:translateY(-1px);
+        box-shadow:0 4px 16px rgba(0,0,0,.4);
+      }
+      .calc-tab:active{transform:scale(.95) translateY(0);}
+      .calc-tab.active{
+        background:linear-gradient(135deg,#7a3e00,#4a2200);
+        border-color:var(--accent);
+        color:var(--accent);
+        box-shadow:0 0 16px rgba(245,166,35,0.25),0 2px 8px rgba(0,0,0,.4);
+        font-weight:700;
+      }
+      .calc-tab.active::before{
+        content:'';position:absolute;top:0;left:0;right:0;height:2px;
+        background:linear-gradient(90deg,transparent,var(--accent),transparent);
+      }
       .calc-display{background:#0a0c14;border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:14px;text-align:right;}
       .calc-expr{font-size:13px;color:var(--muted);min-height:18px;font-family:'Rajdhani',sans-serif;}
       .calc-val{font-size:2.2rem;font-weight:600;color:var(--text);font-family:'Rajdhani',sans-serif;word-break:break-all;}
@@ -2181,6 +2533,1614 @@ function doR2N(){
   if(!s){document.getElementById('nwResult').textContent='Enter Roman numerals';return;}
   const r=fromRoman(s);
   document.getElementById('nwResult').textContent=r?r+' ('+numToWords(r)+')':'Invalid Roman numeral';
+}
+
+
+/* ═══════════════════════════════════════
+   MORSE CODE CONVERTER
+═══════════════════════════════════════ */
+const MORSE_MAP={
+  'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.','G':'--.','H':'....','I':'..','J':'.---',
+  'K':'-.-','L':'.-..','M':'--','N':'-.','O':'---','P':'.--.','Q':'--.-','R':'.-.','S':'...','T':'-',
+  'U':'..-','V':'...-','W':'.--','X':'-..-','Y':'-.--','Z':'--..',
+  '0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..',
+  '9':'----.','.':'.-.-.-',',':'--..--','?':'..--..','!':'-.-.--','/':'-..-.','(':'-.--.',')':'-.--.-',
+  '&':'.-...',':':'---...',';':'-.-.-.','=':'-...-','+':'.-.-.', '-':'-....-','_':'..--.-',
+  '"':'.-..-.','$':'...-..-','@':'.--.-.', "'":'.----.',' ':'/'
+};
+const MORSE_REVERSE=Object.fromEntries(Object.entries(MORSE_MAP).map(([k,v])=>[v,k]));
+
+function textToMorse(text){
+  return text.toUpperCase().split('').map(c=>MORSE_MAP[c]||'').filter(Boolean).join(' ');
+}
+function morseToText(morse){
+  return morse.trim().split(' / ').map(word=>
+    word.split(' ').map(code=>MORSE_REVERSE[code]||'?').join('')
+  ).join(' ');
+}
+
+let morseAudioCtx=null;
+function getMorseCtx(){
+  if(!morseAudioCtx) morseAudioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  return morseAudioCtx;
+}
+let morseNodes=[], morsePaused=false, morsePauseTime=0, morseStartTime=0, morseCtxOffset=0, morseCurrentMorse='';
+
+function stopMorse(){
+  if(morseAudioCtx){
+    morseNodes.forEach(n=>{try{n.stop();}catch(e){}});
+    morseNodes=[];
+  }
+  morsePaused=false;morsePauseTime=0;morseCtxOffset=0;
+  updateMorseButtons('idle');
+}
+
+function pauseMorse(){
+  if(!morseAudioCtx||morsePaused)return;
+  morsePauseTime=morseAudioCtx.currentTime;
+  morseNodes.forEach(n=>{try{n.stop();}catch(e){}});
+  morseNodes=[];
+  morsePaused=true;
+  morseCtxOffset=morsePauseTime-morseStartTime;
+  updateMorseButtons('paused');
+}
+
+function resumeMorse(){
+  if(!morsePaused||!morseCurrentMorse)return;
+  morsePaused=false;
+  playMorseFrom(morseCurrentMorse, morseCtxOffset);
+  updateMorseButtons('playing');
+}
+
+function updateMorseButtons(state){
+  const playBtn=document.getElementById('morseBtnPlay');
+  const pauseBtn=document.getElementById('morseBtnPause');
+  const resumeBtn=document.getElementById('morseBtnResume');
+  const stopBtn=document.getElementById('morseBtnStop');
+  if(!playBtn)return;
+  if(state==='idle'){
+    playBtn.style.display=''; pauseBtn.style.display='none';
+    resumeBtn.style.display='none'; stopBtn.style.display='none';
+  } else if(state==='playing'){
+    playBtn.style.display='none'; pauseBtn.style.display='';
+    resumeBtn.style.display='none'; stopBtn.style.display='';
+  } else if(state==='paused'){
+    playBtn.style.display='none'; pauseBtn.style.display='none';
+    resumeBtn.style.display=''; stopBtn.style.display='';
+  }
+}
+
+function playMorseFrom(morse, skipSeconds=0){
+  const ctx=getMorseCtx();
+  morseStartTime=ctx.currentTime;
+  morseCurrentMorse=morse;
+  const dot=0.08, dash=dot*3, gap=dot, letterGap=dot*3, wordGap=dot*7;
+  let t=ctx.currentTime+0.05;
+  const freq=600;
+  const tokens=morse.split(' ');
+  // Calculate total timeline first, then skip
+  let timeline=[];
+  let pos=0;
+  for(let i=0;i<tokens.length;i++){
+    const token=tokens[i];
+    if(token==='/'){pos+=wordGap;}
+    else{
+      for(let j=0;j<token.length;j++){
+        const dur=token[j]==='.'?dot:dash;
+        timeline.push({start:pos, dur});
+        pos+=dur;
+        if(j<token.length-1) pos+=gap;
+      }
+      if(i<tokens.length-1&&tokens[i+1]!=='/') pos+=letterGap;
+    }
+  }
+  const totalDur=pos;
+  morseNodes=[];
+  let scheduled=0;
+  timeline.forEach(({start,dur})=>{
+    if(start<skipSeconds) return;
+    const osc=ctx.createOscillator(), gain=ctx.createGain();
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.frequency.value=freq;osc.type='sine';
+    const bt=t+(start-skipSeconds);
+    gain.gain.setValueAtTime(0,bt);
+    gain.gain.linearRampToValueAtTime(0.4,bt+0.01);
+    gain.gain.setValueAtTime(0.4,bt+dur-0.01);
+    gain.gain.linearRampToValueAtTime(0,bt+dur);
+    osc.start(bt);osc.stop(bt+dur);
+    morseNodes.push(osc);
+    scheduled++;
+  });
+  // Auto-reset buttons when done
+  const remaining=(totalDur-skipSeconds)*1000+100;
+  setTimeout(()=>{
+    if(!morsePaused){morseNodes=[];updateMorseButtons('idle');}
+  }, remaining);
+  updateMorseButtons('playing');
+}
+
+function playMorse(morse){
+  stopMorse();
+  playMorseFrom(morse, 0);
+}
+
+function renderMorse(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('apps')">← Apps</button></div>
+    <div class='inner-card'>
+      <h2>📡 Morse Code Converter</h2>
+      <p class='subtitle'>Convert text to Morse code and back — with real beep sounds.</p>
+
+      <div style='display:flex;gap:8px;margin-bottom:18px' id='morseTabs'>
+        <button class='calc-tab active' onclick='switchMorse("t2m",this)'>Text → Morse</button>
+        <button class='calc-tab' onclick='switchMorse("m2t",this)'>Morse → Text</button>
+      </div>
+      <div id='morseBody'></div>
+
+      <div style='margin-top:20px;border-top:1px solid var(--border);padding-top:16px'>
+        <div class='field-label' style='margin-bottom:10px'>📖 Morse Code Reference</div>
+        <div style='display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px' id='morseRef'></div>
+      </div>
+
+      ${appFooter('morse')}
+    </div>
+  </div>`;
+
+  // Build reference table
+  const refEl=document.getElementById('morseRef');
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').forEach(c=>{
+    const div=document.createElement('div');
+    div.style.cssText='background:#0a0c14;border:1px solid var(--border);border-radius:8px;padding:6px 8px;text-align:center;';
+    div.innerHTML=`<div style='font-size:13px;font-weight:600;color:var(--text)'>${c}</div><div style='font-size:11px;color:var(--accent);font-family:Rajdhani,sans-serif;letter-spacing:2px'>${MORSE_MAP[c]}</div>`;
+    refEl.appendChild(div);
+  });
+
+  switchMorse('t2m', document.querySelector('.calc-tab'));
+}
+
+function switchMorse(mode, btn){
+  document.querySelectorAll('#morseTabs .calc-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const body=document.getElementById('morseBody');
+  if(mode==='t2m'){
+    body.innerHTML=`
+      <label class='field-label'>Your Text</label>
+      <textarea class='ks-input' id='morseInput' placeholder='Type anything... e.g. Hello World' rows='3' style='resize:vertical;font-family:DM Sans,sans-serif' oninput='liveT2M()'></textarea>
+      <label class='field-label' style='margin-top:12px'>Morse Code Output</label>
+      <div id='morseOutput' style='background:#0a0c14;border:1px solid var(--border);border-radius:14px;padding:16px;min-height:60px;font-family:Rajdhani,sans-serif;font-size:1.1rem;letter-spacing:3px;color:var(--accent);word-break:break-all;line-height:2'>—</div>
+      <div style='display:flex;flex-wrap:wrap;gap:8px;margin-top:12px'>
+        <button id='morseBtnPlay' class='btn btn-primary' style='flex:1;min-width:120px' onclick='playMorseOutput()'>🔊 Play Beeps</button>
+        <button id='morseBtnPause' class='btn' style='flex:1;min-width:100px;display:none;background:#1a2236;border:1px solid var(--border);color:#f5a623;border-radius:14px;padding:14px;cursor:pointer;font-family:DM Sans,sans-serif' onclick='pauseMorse()'>⏸ Pause</button>
+        <button id='morseBtnResume' class='btn' style='flex:1;min-width:100px;display:none;background:#1a2236;border:1px solid var(--border);color:#4ade80;border-radius:14px;padding:14px;cursor:pointer;font-family:DM Sans,sans-serif' onclick='resumeMorse()'>▶ Resume</button>
+        <button id='morseBtnStop' class='btn' style='flex:1;min-width:100px;display:none;background:#2a1020;border:1px solid #f87171;color:#f87171;border-radius:14px;padding:14px;cursor:pointer;font-family:DM Sans,sans-serif' onclick='stopMorse()'>⏹ Stop</button>
+        <button class='btn' style='flex:1;min-width:100px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:14px;padding:14px;cursor:pointer;font-family:DM Sans,sans-serif' onclick='copyMorse()'>📋 Copy</button>
+      </div>
+      <div id='morseMsg' style='font-size:12px;color:#4ade80;margin-top:6px;min-height:16px'></div>`;
+  } else {
+    body.innerHTML=`
+      <label class='field-label'>Morse Code Input</label>
+      <textarea class='ks-input' id='morseInput' placeholder='Enter morse... e.g. .... . .-.. .-.. --- / .-- --- .-. .-.. -..' rows='3' style='resize:vertical;font-family:Rajdhani,sans-serif;letter-spacing:2px' oninput='liveM2T()'></textarea>
+      <p style='font-size:12px;color:var(--muted);margin-top:4px'>Use space between letters, " / " between words</p>
+      <label class='field-label' style='margin-top:12px'>Decoded Text</label>
+      <div id='morseOutput' style='background:#0a0c14;border:1px solid var(--border);border-radius:14px;padding:16px;min-height:60px;font-size:1.3rem;font-weight:600;color:var(--text);word-break:break-all'>—</div>
+      <div style='display:flex;flex-wrap:wrap;gap:8px;margin-top:12px'>
+        <button id='morseBtnPlay' class='btn btn-primary' style='flex:1;min-width:120px' onclick='playMorseInput()'>🔊 Play Beeps</button>
+        <button id='morseBtnPause' class='btn' style='flex:1;min-width:100px;display:none;background:#1a2236;border:1px solid var(--border);color:#f5a623;border-radius:14px;padding:14px;cursor:pointer;font-family:DM Sans,sans-serif' onclick='pauseMorse()'>⏸ Pause</button>
+        <button id='morseBtnResume' class='btn' style='flex:1;min-width:100px;display:none;background:#1a2236;border:1px solid var(--border);color:#4ade80;border-radius:14px;padding:14px;cursor:pointer;font-family:DM Sans,sans-serif' onclick='resumeMorse()'>▶ Resume</button>
+        <button id='morseBtnStop' class='btn' style='flex:1;min-width:100px;display:none;background:#2a1020;border:1px solid #f87171;color:#f87171;border-radius:14px;padding:14px;cursor:pointer;font-family:DM Sans,sans-serif' onclick='stopMorse()'>⏹ Stop</button>
+        <button class='btn' style='flex:1;min-width:100px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:14px;padding:14px;cursor:pointer;font-family:DM Sans,sans-serif' onclick='copyMorse()'>📋 Copy</button>
+      </div>
+      <div id='morseMsg' style='font-size:12px;color:#4ade80;margin-top:6px;min-height:16px'></div>`;
+  }
+}
+
+function liveT2M(){
+  const val=document.getElementById('morseInput').value;
+  const out=val?textToMorse(val):'—';
+  document.getElementById('morseOutput').textContent=out;
+}
+function liveM2T(){
+  const val=document.getElementById('morseInput').value;
+  const out=val?morseToText(val):'—';
+  document.getElementById('morseOutput').textContent=out;
+}
+function playMorseOutput(){
+  const morse=document.getElementById('morseOutput').textContent;
+  if(morse&&morse!=='—') playMorse(morse);
+}
+function playMorseInput(){
+  const morse=document.getElementById('morseInput').value.trim();
+  if(morse) playMorse(morse);
+}
+function copyMorse(){
+  const out=document.getElementById('morseOutput').textContent;
+  if(out&&out!=='—'){
+    navigator.clipboard.writeText(out).then(()=>{
+      const msg=document.getElementById('morseMsg');
+      if(msg){msg.textContent='✅ Copied!';setTimeout(()=>msg.textContent='',2000);}
+    });
+  }
+}
+
+/* ═══════════════════════════════════════
+   GAMES HUB
+═══════════════════════════════════════ */
+const GAMES_LIST=[
+  {id:'ttt',    icon:'⭕', name:'Tic Tac Toe',  desc:'vs Friend or vs AI — Easy, Medium, Hard'},
+  {id:'g2048',  icon:'🔢', name:'2048',          desc:'Slide tiles and reach 2048'},
+  {id:'memory', icon:'🃏', name:'Memory Cards',  desc:'Flip and match all pairs'},
+  {id:'snake',  icon:'🐍', name:'Snake',         desc:'Classic snake — eat and grow'}
+];
+function renderGames(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('home')">← Back</button></div>
+    <div class='page-header'>
+      <div>
+        <div class='section-label'>🎮 Games</div>
+        <h2>Games by KS Tech</h2>
+      </div>
+    </div>
+    <div style='position:relative;margin-bottom:16px'>
+      <span style='position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none'>🔍</span>
+      <input class='ks-input' id='gameSearch' placeholder='Search games...' oninput='filterGames(this.value)' style='padding-left:44px;'>
+    </div>
+    <div class='apps-grid' id='gamesGrid'>
+      ${GAMES_LIST.map(g=>`
+      <div class='app-card' onclick="go('${g.id}')" data-name='${g.name.toLowerCase()}' data-desc='${g.desc.toLowerCase()}'>
+        <div class='app-card-left'><div class='app-icon'>${g.icon}</div><div><div class='app-name'>${g.name}</div><div class='app-desc'>${g.desc}</div></div></div>
+        <div class='app-arrow'>→</div>
+      </div>`).join('')}
+    </div>
+    <div id='noGamesMsg' style='display:none;text-align:center;padding:32px;color:var(--muted);font-size:14px'>😕 No games found.</div>
+  </div>`;
+}
+function filterGames(query){
+  const q=query.toLowerCase().trim();
+  const cards=document.querySelectorAll('#gamesGrid .app-card');
+  let visible=0;
+  cards.forEach(card=>{
+    const match=!q||card.dataset.name.includes(q)||card.dataset.desc.includes(q);
+    card.style.display=match?'':'none';
+    if(match) visible++;
+  });
+  const msg=document.getElementById('noGamesMsg');
+  if(msg) msg.style.display=visible===0?'block':'none';
+}
+
+/* ── TIC TAC TOE ── */
+let tttBoard, tttTurn, tttMode, tttScore={X:0,O:0,D:0}, tttDifficulty='medium';
+function renderTTT(){
+  if(!tttMode) tttMode='friend';
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('games')">← Games</button></div>
+    <div class='inner-card'>
+      <h2>⭕ Tic Tac Toe</h2>
+      <div style='display:flex;gap:8px;margin-bottom:12px' id='tttModeBtns'>
+        <button class='calc-tab ${tttMode==="friend"?"active":""}' onclick='setTTTMode("friend")'>👥 vs Friend</button>
+        <button class='calc-tab ${tttMode==="ai"?"active":""}' onclick='setTTTMode("ai")'>🤖 vs AI</button>
+      </div>
+      <div id='tttDiffRow' style='display:${tttMode==="ai"?"flex":"none"};gap:8px;margin-bottom:12px'>
+        <button class='calc-tab ${tttDifficulty==="easy"?"active":""}' onclick='setTTTDiff("easy")' style='font-size:12px'>😊 Easy</button>
+        <button class='calc-tab ${tttDifficulty==="medium"?"active":""}' onclick='setTTTDiff("medium")' style='font-size:12px'>🤔 Medium</button>
+        <button class='calc-tab ${tttDifficulty==="hard"?"active":""}' onclick='setTTTDiff("hard")' style='font-size:12px'>💀 Hard</button>
+      </div>
+      <div style='display:flex;justify-content:space-between;margin-bottom:14px;background:#0a0c14;border:1px solid var(--border);border-radius:12px;padding:12px'>
+        <div style='text-align:center'><div style='font-size:1.2rem;font-family:Rajdhani,sans-serif;font-weight:700;color:#4ade80'>${tttScore.X}</div><div style='font-size:11px;color:var(--muted)'>X Wins</div></div>
+        <div style='text-align:center'><div style='font-size:1.2rem;font-family:Rajdhani,sans-serif;font-weight:700;color:var(--muted)'>${tttScore.D}</div><div style='font-size:11px;color:var(--muted)'>Draws</div></div>
+        <div style='text-align:center'><div style='font-size:1.2rem;font-family:Rajdhani,sans-serif;font-weight:700;color:#f87171'>${tttScore.O}</div><div style='font-size:11px;color:var(--muted)'>O Wins</div></div>
+      </div>
+      <div id='tttStatus' style='text-align:center;font-size:1rem;color:var(--muted);margin-bottom:12px'>X's turn</div>
+      <div id='tttBoard' style='display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:300px;margin:0 auto'></div>
+      <button class='btn btn-primary' style='margin-top:16px;width:100%' onclick='resetTTT()'>🔄 New Game</button>
+    </div>
+  </div>`;
+  initTTT();
+}
+function setTTTMode(mode){
+  tttMode=mode; tttScore={X:0,O:0,D:0};
+  const diffRow=document.getElementById('tttDiffRow');
+  if(diffRow) diffRow.style.display=mode==='ai'?'flex':'none';
+  document.querySelectorAll('#tttModeBtns .calc-tab').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  initTTT();
+}
+function setTTTDiff(diff){
+  tttDifficulty=diff; tttScore={X:0,O:0,D:0};
+  document.querySelectorAll('#tttDiffRow .calc-tab').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  initTTT();
+  const status=document.getElementById('tttStatus');
+  if(status) status.textContent="X's turn";
+}
+function initTTT(){
+  tttBoard=Array(9).fill('');tttTurn='X';
+  renderTTTBoard();
+}
+function renderTTTBoard(winCells=[]){
+  const el=document.getElementById('tttBoard');
+  if(!el)return;
+  el.innerHTML=tttBoard.map((cell,i)=>{
+    const isWin=winCells.includes(i);
+    const color=cell==='X'?'#4ade80':cell==='O'?'#f87171':'var(--muted)';
+    return `<button onclick='tttClick(${i})' style='
+      height:90px;border-radius:14px;border:2px solid ${isWin?'var(--accent)':'var(--border)'};
+      background:${isWin?'rgba(245,166,35,0.15)':'#0a0c14'};
+      font-size:2rem;font-weight:800;color:${color};cursor:pointer;
+      transition:transform .15s,background .2s;font-family:Syne,sans-serif;
+    ' onmouseover='this.style.transform="scale(1.05)"' onmouseout='this.style.transform="scale(1)"'>${cell}</button>`;
+  }).join('');
+}
+function tttClick(i){
+  if(tttBoard[i]||tttCheckWin()) return;
+  tttBoard[i]=tttTurn;
+  const win=tttCheckWin();
+  if(win){
+    tttScore[tttTurn]++;
+    document.getElementById('tttStatus').innerHTML=`<span style='color:var(--accent);font-weight:700'>${tttTurn} wins! 🎉</span>`;
+    renderTTTBoard(win);return;
+  }
+  if(tttBoard.every(c=>c)){
+    tttScore.D++;
+    document.getElementById('tttStatus').textContent="It's a draw! 🤝";
+    renderTTTBoard();return;
+  }
+  tttTurn=tttTurn==='X'?'O':'X';
+  document.getElementById('tttStatus').textContent=`${tttTurn}'s turn`;
+  renderTTTBoard();
+  if(tttMode==='ai'&&tttTurn==='O') setTimeout(tttAIMove,400);
+}
+function tttCheckWin(){
+  const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  for(const [a,b,c] of lines) if(tttBoard[a]&&tttBoard[a]===tttBoard[b]&&tttBoard[a]===tttBoard[c]) return [a,b,c];
+  return null;
+}
+function tttAIMove(){
+  function checkWinBoard(b){
+    const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for(const [a,bc,c] of lines) if(b[a]&&b[a]===b[bc]&&b[a]===b[c]) return b[a];
+    return null;
+  }
+  function minimax(board, isMax, depth){
+    const win=checkWinBoard(board);
+    if(win==='O') return 10-depth;
+    if(win==='X') return depth-10;
+    if(board.every(c=>c)) return 0;
+    let best=isMax?-Infinity:Infinity;
+    board.forEach((_,i)=>{
+      if(!board[i]){
+        board[i]=isMax?'O':'X';
+        const score=minimax(board,!isMax,depth+1);
+        board[i]='';
+        best=isMax?Math.max(best,score):Math.min(best,score);
+      }
+    });
+    return best;
+  }
+
+  const empty=tttBoard.map((v,i)=>v===''?i:-1).filter(i=>i>=0);
+
+  // Easy: 70% random move
+  if(tttDifficulty==='easy'){
+    if(Math.random()<0.7){
+      tttClick(empty[Math.floor(Math.random()*empty.length)]);return;
+    }
+  }
+
+  // Medium: block wins, take wins, else random
+  if(tttDifficulty==='medium'){
+    // Check if AI can win
+    for(const i of empty){
+      tttBoard[i]='O';
+      if(checkWinBoard(tttBoard)){tttBoard[i]='';tttClick(i);return;}
+      tttBoard[i]='';
+    }
+    // Block player win
+    for(const i of empty){
+      tttBoard[i]='X';
+      if(checkWinBoard(tttBoard)){tttBoard[i]='';tttClick(i);return;}
+      tttBoard[i]='';
+    }
+    // Take center or random
+    if(tttBoard[4]===''){tttClick(4);return;}
+    tttClick(empty[Math.floor(Math.random()*empty.length)]);
+    return;
+  }
+
+  // Hard: full minimax — unbeatable
+  let best=-Infinity, move=empty[0];
+  empty.forEach(i=>{
+    tttBoard[i]='O';
+    const score=minimax([...tttBoard],false,0);
+    tttBoard[i]='';
+    if(score>best){best=score;move=i;}
+  });
+  tttClick(move);
+}
+function resetTTT(){initTTT();document.getElementById('tttStatus').textContent="X's turn";}
+
+/* ── 2048 ── */
+let g2048Board, g2048Score, g2048Best=0, g2048Over, g2048Diff='medium';
+function renderG2048(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('games')">← Games</button></div>
+    <div class='inner-card'>
+      <h2>🔢 2048</h2>
+      <div style='display:flex;gap:8px;margin-bottom:12px'>
+        <button class='calc-tab ${g2048Diff==="easy"?"active":""}' onclick='set2048Diff("easy")' style='font-size:12px'>😊 Easy<br><span style='font-size:10px;opacity:.7'>4×4 slow</span></button>
+        <button class='calc-tab ${g2048Diff==="medium"?"active":""}' onclick='set2048Diff("medium")' style='font-size:12px'>🤔 Medium<br><span style='font-size:10px;opacity:.7'>4×4 normal</span></button>
+        <button class='calc-tab ${g2048Diff==="hard"?"active":""}' onclick='set2048Diff("hard")' style='font-size:12px'>💀 Hard<br><span style='font-size:10px;opacity:.7'>5×5 fast</span></button>
+      </div>
+      <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:14px'>
+        <div style='display:flex;gap:10px'>
+          <div style='background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:8px 16px;text-align:center'>
+            <div style='font-size:11px;color:var(--muted)'>SCORE</div>
+            <div id='g2048Score' style='font-family:Rajdhani,sans-serif;font-size:1.3rem;font-weight:700;color:var(--accent)'>0</div>
+          </div>
+          <div style='background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:8px 16px;text-align:center'>
+            <div style='font-size:11px;color:var(--muted)'>BEST</div>
+            <div id='g2048Best' style='font-family:Rajdhani,sans-serif;font-size:1.3rem;font-weight:700;color:#a78bfa'>0</div>
+          </div>
+        </div>
+        <button class='btn btn-primary' style='padding:10px 18px' onclick='init2048()'>New</button>
+      </div>
+      <div id='g2048Grid' style='display:grid;grid-template-columns:repeat(${g2048Diff==="hard"?5:4},1fr);gap:8px;background:#0a0c14;border:1px solid var(--border);border-radius:16px;padding:12px;touch-action:none'></div>
+      <div id='g2048Msg' style='text-align:center;margin-top:12px;font-size:1.1rem;font-weight:700;min-height:28px'></div>
+      <p style='font-size:12px;color:var(--muted);text-align:center;margin-top:8px'>Swipe or use arrow keys to slide tiles</p>
+    </div>
+  </div>`;
+  init2048();
+  setup2048Touch();
+  setup2048Keys();
+}
+const TILE_COLORS={2:'#3d2a1e',4:'#4a2e1a',8:'#7c3a1a',16:'#8b2e0a',32:'#9b2200',64:'#a31500',128:'#7c4a00',256:'#8b5a00',512:'#6b4c00',1024:'#4a3d00',2048:'#2a3300'};
+function set2048Diff(diff){
+  g2048Diff=diff; g2048Best=0;
+  document.querySelectorAll('#g2048DiffRow .calc-tab').forEach(b=>b.classList.remove('active'));
+  const btns=document.querySelectorAll('.calc-tab');
+  btns.forEach(b=>{if(b.textContent.toLowerCase().includes(diff)) b.classList.add('active');});
+  // Update grid columns
+  const grid=document.getElementById('g2048Grid');
+  if(grid){const cols=diff==='hard'?5:4;grid.style.gridTemplateColumns=`repeat(${cols},1fr)`;}
+  init2048();
+}
+function get2048Size(){return g2048Diff==='hard'?25:16;}
+function get2048Cols(){return g2048Diff==='hard'?5:4;}
+function init2048(){
+  const size=get2048Size();
+  g2048Board=Array(size).fill(0);g2048Score=0;g2048Over=false;
+  add2048Tile();add2048Tile();
+  const grid=document.getElementById('g2048Grid');
+  if(grid) grid.style.gridTemplateColumns=`repeat(${get2048Cols()},1fr)`;
+  render2048();
+}
+function add2048Tile(){
+  const empty=g2048Board.map((v,i)=>v===0?i:-1).filter(i=>i>=0);
+  if(!empty.length)return;
+  const idx=empty[Math.floor(Math.random()*empty.length)];
+  g2048Board[idx]=Math.random()<0.9?2:4;
+}
+function render2048(){
+  const grid=document.getElementById('g2048Grid');
+  if(!grid)return;
+  grid.innerHTML=g2048Board.map(v=>`
+    <div style='
+      height:${g2048Diff==="hard"?52:64}px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+      background:${v?TILE_COLORS[v]||'#1a0a00':'#161c2a'};
+      border:1px solid ${v?'rgba(245,166,35,0.3)':'var(--border)'};
+      font-family:Rajdhani,sans-serif;font-size:${v>=1000?'1.1rem':v>=100?'1.3rem':'1.5rem'};
+      font-weight:700;color:${v?'#f5a623':'#2a334a'};
+      transition:all .1s;
+    '>${v||''}</div>`).join('');
+  const scoreEl=document.getElementById('g2048Score');
+  const bestEl=document.getElementById('g2048Best');
+  if(scoreEl) scoreEl.textContent=g2048Score;
+  if(g2048Score>g2048Best) g2048Best=g2048Score;
+  if(bestEl) bestEl.textContent=g2048Best;
+  const msg=document.getElementById('g2048Msg');
+  if(msg) msg.innerHTML=g2048Over?`<span style='color:#f87171'>Game Over! 😢</span>`:g2048Board.includes(2048)?`<span style='color:#4ade80'>You reached 2048! 🎉</span>`:'';
+}
+function slide2048(row,size=4){
+  let r=row.filter(v=>v);
+  for(let i=0;i<r.length-1;i++) if(r[i]===r[i+1]){r[i]*=2;g2048Score+=r[i];r.splice(i+1,1);i++;}
+  while(r.length<size) r.push(0);
+  return r;
+}
+function move2048(dir){
+  if(g2048Over)return;
+  const cols=get2048Cols(), rows=get2048Size()/cols;
+  let b=[...g2048Board], changed=false;
+  for(let i=0;i<(dir==='left'||dir==='right'?rows:cols);i++){
+    let row=[];
+    if(dir==='left') row=b.slice(i*cols,i*cols+cols);
+    else if(dir==='right') row=b.slice(i*cols,i*cols+cols).reverse();
+    else if(dir==='up'){for(let k=0;k<rows;k++) row.push(b[i+k*cols]);}
+    else{for(let k=rows-1;k>=0;k--) row.push(b[i+k*cols]);}
+    const slid=slide2048(row,dir==='left'||dir==='right'?cols:rows);
+    if(dir==='right') slid.reverse();
+    for(let j=0;j<slid.length;j++){
+      let idx;
+      if(dir==='left') idx=i*cols+j;
+      else if(dir==='right') idx=i*cols+j;
+      else if(dir==='up') idx=i+j*cols;
+      else idx=i+(rows-1-j)*cols;
+      if(b[idx]!==slid[j]){changed=true;b[idx]=slid[j];}
+    }
+  }
+  if(changed){g2048Board=b;add2048Tile();
+    if(!canMove2048()) g2048Over=true;
+    render2048();
+  }
+}
+function canMove2048(){
+  const cols=get2048Cols(),rows=get2048Size()/cols;
+  if(g2048Board.includes(0))return true;
+  for(let i=0;i<rows;i++) for(let j=0;j<cols;j++){
+    const idx=i*cols+j;
+    if(j<cols-1&&g2048Board[idx]===g2048Board[idx+1])return true;
+    if(i<rows-1&&g2048Board[idx]===g2048Board[idx+cols])return true;
+  }
+  return false;
+}
+function setup2048Keys(){
+  document.onkeydown=e=>{
+    const map={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down'};
+    if(map[e.key]){e.preventDefault();move2048(map[e.key]);}
+  };
+}
+function setup2048Touch(){
+  let sx,sy;
+  const el=document.getElementById('g2048Grid');
+  if(!el)return;
+  el.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
+  el.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+    if(Math.max(Math.abs(dx),Math.abs(dy))<20)return;
+    if(Math.abs(dx)>Math.abs(dy)) move2048(dx>0?'right':'left');
+    else move2048(dy>0?'down':'up');
+  },{passive:true});
+}
+
+/* ── MEMORY CARDS ── */
+const MEMORY_EMOJIS=['🎯','🎲','🎸','🎺','🎻','🎹','🎨','🎭','🏆','🎪','🚀','🌟','🦁','🐯','🦊','🦋'];
+let memCards, memFlipped, memMatched, memLock, memMoves, memTimer, memTime, memDiff='medium';
+function renderMemory(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('games')">← Games</button></div>
+    <div class='inner-card'>
+      <h2>🃏 Memory Cards</h2>
+      <div style='display:flex;gap:8px;margin-bottom:12px'>
+        <button class='calc-tab ${memDiff==="easy"?"active":""}' onclick='setMemDiff("easy")' style='font-size:12px'>😊 Easy<br><span style='font-size:10px;opacity:.7'>4 pairs</span></button>
+        <button class='calc-tab ${memDiff==="medium"?"active":""}' onclick='setMemDiff("medium")' style='font-size:12px'>🤔 Medium<br><span style='font-size:10px;opacity:.7'>8 pairs</span></button>
+        <button class='calc-tab ${memDiff==="hard"?"active":""}' onclick='setMemDiff("hard")' style='font-size:12px'>💀 Hard<br><span style='font-size:10px;opacity:.7'>16 pairs</span></button>
+      </div>
+      <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:14px'>
+        <div style='display:flex;gap:10px'>
+          <div style='background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:8px 14px;text-align:center'>
+            <div style='font-size:11px;color:var(--muted)'>MOVES</div>
+            <div id='memMoves' style='font-family:Rajdhani,sans-serif;font-size:1.2rem;font-weight:700;color:var(--accent)'>0</div>
+          </div>
+          <div style='background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:8px 14px;text-align:center'>
+            <div style='font-size:11px;color:var(--muted)'>TIME</div>
+            <div id='memTime' style='font-family:Rajdhani,sans-serif;font-size:1.2rem;font-weight:700;color:#a78bfa'>0s</div>
+          </div>
+        </div>
+        <button class='btn btn-primary' style='padding:10px 18px' onclick='initMemory()'>New</button>
+      </div>
+      <div id='memGrid' style='display:grid;grid-template-columns:repeat(4,1fr);gap:8px'></div>
+      <div id='memWin' style='text-align:center;margin-top:14px;min-height:24px'></div>
+    </div>
+  </div>`;
+  initMemory();
+}
+function setMemDiff(diff){
+  memDiff=diff;
+  initMemory();
+}
+function getMemPairs(){return memDiff==='easy'?4:memDiff==='hard'?16:8;}
+function getMemCols(){return memDiff==='hard'?8:4;}
+function initMemory(){
+  clearInterval(memTimer);
+  const pairCount=getMemPairs();
+  // For hard mode (16 pairs), use extended emoji set
+  const allEmojis=[...MEMORY_EMOJIS,'🌈','🌊','🔥','⚡','🌙','☀️','🎃','🏄','🎯','🦄','🌺','🍕','🎸','🏆','💎','🚂'];
+  const pairs=allEmojis.slice(0,pairCount);
+  memCards=[...pairs,...pairs].sort(()=>Math.random()-.5).map((e,i)=>({id:i,emoji:e,flipped:false,matched:false}));
+  memFlipped=[];memMatched=0;memLock=false;memMoves=0;memTime=0;
+  memTimer=setInterval(()=>{
+    memTime++;
+    const el=document.getElementById('memTime');
+    if(el) el.textContent=memTime+'s';
+  },1000);
+  renderMemGrid();
+}
+function renderMemGrid(){
+  const grid=document.getElementById('memGrid');
+  if(!grid)return;
+  grid.style.gridTemplateColumns=`repeat(${getMemCols()},1fr)`;
+  grid.innerHTML=memCards.map(c=>`
+    <div onclick='flipCard(${c.id})' style='
+      height:${memDiff==='hard'?50:70}px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+      font-size:${c.flipped||c.matched?(memDiff==='hard'?'1.3rem':'1.8rem'):'1rem'};
+      background:${c.matched?'rgba(74,222,128,0.1)':c.flipped?'#1a2236':'#0a0c14'};
+      border:2px solid ${c.matched?'#4ade80':c.flipped?'var(--accent)':'var(--border)'};
+      cursor:${c.matched?'default':'pointer'};transition:all .25s;
+    '>${c.flipped||c.matched?c.emoji:'?'}</div>`).join('');
+  const mv=document.getElementById('memMoves');
+  if(mv) mv.textContent=memMoves;
+}
+function flipCard(id){
+  if(memLock) return;
+  const card=memCards.find(c=>c.id===id);
+  if(!card||card.flipped||card.matched)return;
+  card.flipped=true;memFlipped.push(card);
+  renderMemGrid();
+  if(memFlipped.length===2){
+    memMoves++;memLock=true;
+    if(memFlipped[0].emoji===memFlipped[1].emoji){
+      memFlipped.forEach(c=>c.matched=true);
+      memMatched+=2;memFlipped=[];memLock=false;
+      renderMemGrid();
+      if(memMatched===memCards.length){
+        clearInterval(memTimer);
+        const win=document.getElementById('memWin');
+        if(win) win.innerHTML=`<span style='color:#4ade80;font-weight:700;font-size:1.1rem'>🎉 Completed in ${memMoves} moves & ${memTime}s!</span>`;
+      }
+    } else {
+      setTimeout(()=>{memFlipped.forEach(c=>c.flipped=false);memFlipped=[];memLock=false;renderMemGrid();},900);
+    }
+  }
+}
+
+/* ── SNAKE ── */
+let snakeBody, snakeDir, snakeFood, snakeScore, snakeBest=0, snakeLoop, snakeRunning, snakeSpeed, snakeDiff='medium';
+function renderSnake(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('games')">← Games</button></div>
+    <div class='inner-card'>
+      <h2>🐍 Snake</h2>
+      <div style='display:flex;gap:8px;margin-bottom:12px'>
+        <button class='calc-tab ${snakeDiff==="easy"?"active":""}' onclick='setSnakeDiff("easy")' style='font-size:12px'>😊 Easy<br><span style='font-size:10px;opacity:.7'>slow</span></button>
+        <button class='calc-tab ${snakeDiff==="medium"?"active":""}' onclick='setSnakeDiff("medium")' style='font-size:12px'>🤔 Medium<br><span style='font-size:10px;opacity:.7'>normal</span></button>
+        <button class='calc-tab ${snakeDiff==="hard"?"active":""}' onclick='setSnakeDiff("hard")' style='font-size:12px'>💀 Hard<br><span style='font-size:10px;opacity:.7'>fast!</span></button>
+      </div>
+      <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:12px'>
+        <div style='display:flex;gap:10px'>
+          <div style='background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:8px 14px;text-align:center'>
+            <div style='font-size:11px;color:var(--muted)'>SCORE</div>
+            <div id='snakeScore' style='font-family:Rajdhani,sans-serif;font-size:1.2rem;font-weight:700;color:var(--accent)'>0</div>
+          </div>
+          <div style='background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:8px 14px;text-align:center'>
+            <div style='font-size:11px;color:var(--muted)'>BEST</div>
+            <div id='snakeBest' style='font-family:Rajdhani,sans-serif;font-size:1.2rem;font-weight:700;color:#a78bfa'>0</div>
+          </div>
+        </div>
+        <button class='btn btn-primary' style='padding:10px 18px' onclick='initSnake()'>New</button>
+      </div>
+      <canvas id='snakeCanvas' style='display:block;border-radius:14px;border:1px solid var(--border);background:#0a0c14;width:100%;max-width:360px;margin:0 auto;touch-action:none'></canvas>
+      <div id='snakeMsg' style='text-align:center;margin-top:10px;min-height:24px'></div>
+      <div style='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:200px;margin:14px auto 0'>
+        <div></div>
+        <button onclick="snakeBtn('up')" style='padding:14px;border-radius:12px;background:#1a2236;border:1px solid var(--border);color:var(--text);font-size:1.2rem;cursor:pointer'>▲</button>
+        <div></div>
+        <button onclick="snakeBtn('left')" style='padding:14px;border-radius:12px;background:#1a2236;border:1px solid var(--border);color:var(--text);font-size:1.2rem;cursor:pointer'>◀</button>
+        <button onclick="snakeBtn('down')" style='padding:14px;border-radius:12px;background:#1a2236;border:1px solid var(--border);color:var(--text);font-size:1.2rem;cursor:pointer'>▼</button>
+        <button onclick="snakeBtn('right')" style='padding:14px;border-radius:12px;background:#1a2236;border:1px solid var(--border);color:var(--text);font-size:1.2rem;cursor:pointer'>▶</button>
+      </div>
+      <p style='font-size:12px;color:var(--muted);text-align:center;margin-top:8px'>Arrow keys or tap buttons above</p>
+    </div>
+  </div>`;
+  initSnake();
+  setupSnakeKeys();
+  setupSnakeTouch();
+}
+const SNAKE_COLS=18, SNAKE_ROWS=18, SNAKE_SIZE=20;
+function setSnakeDiff(diff){snakeDiff=diff;snakeBest=0;initSnake();}
+function getSnakeStartSpeed(){return snakeDiff==='easy'?220:snakeDiff==='hard'?90:150;}
+function initSnake(){
+  clearInterval(snakeLoop);
+  snakeBody=[{x:9,y:9},{x:8,y:9},{x:7,y:9}];
+  snakeDir={x:1,y:0};snakeScore=0;snakeRunning=true;snakeSpeed=getSnakeStartSpeed();
+  placeSnakeFood();
+  const canvas=document.getElementById('snakeCanvas');
+  if(canvas){canvas.width=SNAKE_COLS*SNAKE_SIZE;canvas.height=SNAKE_ROWS*SNAKE_SIZE;}
+  drawSnake();
+  snakeLoop=setInterval(stepSnake,snakeSpeed);
+  const msg=document.getElementById('snakeMsg');
+  if(msg) msg.innerHTML='';
+}
+function placeSnakeFood(){
+  do{snakeFood={x:Math.floor(Math.random()*SNAKE_COLS),y:Math.floor(Math.random()*SNAKE_ROWS)};}
+  while(snakeBody.some(s=>s.x===snakeFood.x&&s.y===snakeFood.y));
+}
+function stepSnake(){
+  if(!snakeRunning)return;
+  const head={x:snakeBody[0].x+snakeDir.x,y:snakeBody[0].y+snakeDir.y};
+  if(head.x<0||head.x>=SNAKE_COLS||head.y<0||head.y>=SNAKE_ROWS||snakeBody.some(s=>s.x===head.x&&s.y===head.y)){
+    snakeRunning=false;clearInterval(snakeLoop);
+    if(snakeScore>snakeBest){snakeBest=snakeScore;const b=document.getElementById('snakeBest');if(b)b.textContent=snakeBest;}
+    const msg=document.getElementById('snakeMsg');
+    if(msg) msg.innerHTML=`<span style='color:#f87171;font-weight:700'>Game Over! Score: ${snakeScore} 💀</span>`;
+    return;
+  }
+  snakeBody.unshift(head);
+  if(head.x===snakeFood.x&&head.y===snakeFood.y){
+    snakeScore++;
+    const sc=document.getElementById('snakeScore');if(sc)sc.textContent=snakeScore;
+    if(snakeScore>snakeBest){snakeBest=snakeScore;const b=document.getElementById('snakeBest');if(b)b.textContent=snakeBest;}
+    placeSnakeFood();
+    if(snakeScore%5===0){clearInterval(snakeLoop);const minSpeed=snakeDiff==='easy'?120:snakeDiff==='hard'?40:60;snakeSpeed=Math.max(minSpeed,snakeSpeed-15);snakeLoop=setInterval(stepSnake,snakeSpeed);}
+  } else snakeBody.pop();
+  drawSnake();
+}
+function drawSnake(){
+  const canvas=document.getElementById('snakeCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // Draw grid dots
+  ctx.fillStyle='#161c2a';
+  for(let x=0;x<SNAKE_COLS;x++) for(let y=0;y<SNAKE_ROWS;y++){
+    ctx.beginPath();ctx.arc(x*SNAKE_SIZE+SNAKE_SIZE/2,y*SNAKE_SIZE+SNAKE_SIZE/2,1,0,Math.PI*2);ctx.fill();
+  }
+  // Draw food
+  ctx.fillStyle='#f5a623';
+  ctx.shadowColor='#f5a623';ctx.shadowBlur=12;
+  ctx.beginPath();ctx.arc(snakeFood.x*SNAKE_SIZE+SNAKE_SIZE/2,snakeFood.y*SNAKE_SIZE+SNAKE_SIZE/2,SNAKE_SIZE/2-2,0,Math.PI*2);ctx.fill();
+  ctx.shadowBlur=0;
+  // Draw snake
+  snakeBody.forEach((seg,i)=>{
+    const ratio=1-i/snakeBody.length;
+    ctx.fillStyle=`hsl(${140+i*2},${70-i}%,${45+ratio*15}%)`;
+    ctx.shadowColor=i===0?'#4ade80':'transparent';ctx.shadowBlur=i===0?10:0;
+    const pad=i===0?1:2;
+    const rx=seg.x*SNAKE_SIZE+pad, ry=seg.y*SNAKE_SIZE+pad, rw=SNAKE_SIZE-pad*2, rh=SNAKE_SIZE-pad*2, rr=4;
+    ctx.beginPath();ctx.moveTo(rx+rr,ry);ctx.lineTo(rx+rw-rr,ry);ctx.arcTo(rx+rw,ry,rx+rw,ry+rr,rr);ctx.lineTo(rx+rw,ry+rh-rr);ctx.arcTo(rx+rw,ry+rh,rx+rw-rr,ry+rh,rr);ctx.lineTo(rx+rr,ry+rh);ctx.arcTo(rx,ry+rh,rx,ry+rh-rr,rr);ctx.lineTo(rx,ry+rr);ctx.arcTo(rx,ry,rx+rr,ry,rr);ctx.closePath();
+    ctx.fill();
+  });
+  ctx.shadowBlur=0;
+}
+function setupSnakeKeys(){
+  document.onkeydown=e=>{
+    const map={ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0}};
+    if(map[e.key]){
+      e.preventDefault();
+      const d=map[e.key];
+      if(d.x!==-snakeDir.x||d.y!==-snakeDir.y) snakeDir=d;
+    }
+  };
+}
+function snakeBtn(dir){
+  const map={up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}};
+  const d=map[dir];
+  if(d.x!==-snakeDir.x||d.y!==-snakeDir.y) snakeDir=d;
+}
+function setupSnakeTouch(){
+  let sx,sy;
+  const canvas=document.getElementById('snakeCanvas');
+  if(!canvas)return;
+  canvas.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
+  canvas.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+    if(Math.max(Math.abs(dx),Math.abs(dy))<15)return;
+    if(Math.abs(dx)>Math.abs(dy)) snakeBtn(dx>0?'right':'left');
+    else snakeBtn(dy>0?'down':'up');
+  },{passive:true});
+}
+/* ═══════════════════════════════════════
+   HEALTH HUB
+═══════════════════════════════════════ */
+const HEALTH_TOOLS=[
+  {id:'breath',    icon:'🌬️', name:'Breathing Exercise',   desc:'Box, 4-7-8 & deep breathing guides'},
+  {id:'lunghold',  icon:'🫁', name:'Lung Capacity Test',    desc:'How long can you hold your breath?'},
+  {id:'breathrate',icon:'📊', name:'Breath Rate Counter',   desc:'Count your breaths per minute'},
+  {id:'heartrate', icon:'❤️', name:'Heart Rate Monitor',    desc:'Manual pulse counter — tap to measure'},
+  {id:'heartzone', icon:'🏃', name:'Heart Rate Zones',      desc:'Find your training zones by age & max HR'},
+  {id:'stress',    icon:'🧘', name:'Stress Relief Timer',   desc:'Guided relaxation with breathing pauses'},
+  {id:'eyetimer',  icon:'👁️', name:'20-20-20 Eye Timer',   desc:'Reminder to rest eyes every 20 minutes'},
+  {id:'water',     icon:'💧', name:'Water Intake Tracker',  desc:'Track daily hydration goals'}
+];
+
+function renderHealth(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('apps')">← Apps</button></div>
+    <div class='page-header'>
+      <div>
+        <div class='section-label'>🩺 Health Hub</div>
+        <h2>Health & Wellness Tools</h2>
+      </div>
+    </div>
+    <div style='position:relative;margin-bottom:16px'>
+      <span style='position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none'>🔍</span>
+      <input class='ks-input' id='healthSearch' placeholder='Search health tools...' oninput='filterHealth(this.value)' style='padding-left:44px;'>
+    </div>
+    <div class='apps-grid' id='healthGrid'>
+      ${HEALTH_TOOLS.map(t=>`
+      <div class='app-card' onclick="go('${t.id}')" data-name='${t.name.toLowerCase()}' data-desc='${t.desc.toLowerCase()}'>
+        <div class='app-card-left'>
+          <div class='app-icon'>${t.icon}</div>
+          <div>
+            <div class='app-name'>${t.name}</div>
+            <div class='app-desc'>${t.desc}</div>
+          </div>
+        </div>
+        <div class='app-arrow'>→</div>
+      </div>`).join('')}
+    </div>
+    <div id='noHealthMsg' style='display:none;text-align:center;padding:32px;color:var(--muted);font-size:14px'>😕 No tools found.</div>
+  </div>`;
+}
+function filterHealth(query){
+  const q=query.toLowerCase().trim();
+  const cards=document.querySelectorAll('#healthGrid .app-card');
+  let visible=0;
+  cards.forEach(card=>{
+    const match=!q||card.dataset.name.includes(q)||card.dataset.desc.includes(q);
+    card.style.display=match?'':'none';
+    if(match) visible++;
+  });
+  const msg=document.getElementById('noHealthMsg');
+  if(msg) msg.style.display=visible===0?'block':'none';
+}
+
+/* ── BREATHING EXERCISE ── */
+let breathInterval=null, breathPhase=0, breathCycle=0;
+const BREATH_MODES={
+  box:{name:'Box Breathing',phases:['Inhale','Hold','Exhale','Hold'],times:[4,4,4,4],color:'#3D52D5'},
+  '478':{name:'4-7-8 Breathing',phases:['Inhale','Hold','Exhale'],times:[4,7,8],color:'#a78bfa'},
+  deep:{name:'Deep Breathing',phases:['Inhale','Exhale'],times:[5,5],color:'#4ade80'}
+};
+let breathMode='box';
+/* helper: update button states */
+function setHealthBtns(startId, pauseId, resumeId, resetId, state){
+  const s=document.getElementById(startId);
+  const p=pauseId?document.getElementById(pauseId):null;
+  const r=resumeId?document.getElementById(resumeId):null;
+  const rs=resetId?document.getElementById(resetId):null;
+  // state: 'idle' | 'running' | 'paused'
+  if(state==='idle'){
+    if(s){s.className='btn btn-primary';s.disabled=false;}
+    if(p){p.style.display='none';}
+    if(r){r.style.display='none';}
+    if(rs){rs.style.display='';}
+  } else if(state==='running'){
+    if(s){s.className='btn btn-running';s.disabled=true;}
+    if(p){p.style.display='';}
+    if(r){r.style.display='none';}
+    if(rs){rs.style.display='';}
+  } else if(state==='paused'){
+    if(s){s.className='btn btn-paused';s.disabled=true;}
+    if(p){p.style.display='none';}
+    if(r){r.style.display='';}
+    if(rs){rs.style.display='';}
+  }
+}
+
+/* ── BREATHING EXERCISE ── */
+function renderBreath(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('health')">← Health</button></div>
+    <div class='inner-card'>
+      <h2>🌬️ Breathing Exercise</h2>
+      <p class='subtitle'>Follow the guide to calm your mind and body.</p>
+      <div style='display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px'>
+        <button class='calc-tab active' onclick='setBreathMode("box",this)'>📦 Box (4-4-4-4)</button>
+        <button class='calc-tab' onclick='setBreathMode("478",this)'>✨ 4-7-8</button>
+        <button class='calc-tab' onclick='setBreathMode("deep",this)'>🍃 Deep (5-5)</button>
+      </div>
+      <div id='breathCircleWrap' style='display:flex;flex-direction:column;align-items:center;padding:20px 0'>
+        <div id='breathCircle' style='
+          width:180px;height:180px;border-radius:50%;
+          background:radial-gradient(circle,#1a2a4a,#0a0c14);
+          border:3px solid #3D52D5;
+          display:flex;flex-direction:column;align-items:center;justify-content:center;
+          transition:transform 4s ease-in-out, border-color 1s, box-shadow 1s;
+          box-shadow:0 0 30px rgba(61,82,213,0.3);
+          margin-bottom:16px;
+        '>
+          <div id='breathPhaseLabel' style='font-family:Syne,sans-serif;font-weight:800;font-size:1.1rem;color:#fff'>Ready</div>
+          <div id='breathCount' style='font-family:Rajdhani,sans-serif;font-size:2.5rem;font-weight:700;color:#3D52D5;line-height:1'>–</div>
+        </div>
+        <div id='breathCycleInfo' style='font-size:13px;color:var(--muted);margin-bottom:16px'>Cycle: <span id='breathCycleNum' style='color:var(--accent);font-weight:700'>0</span></div>
+        <div style='display:flex;gap:10px;flex-wrap:wrap;justify-content:center'>
+          <button class='btn btn-primary' id='breathStartBtn' onclick='startBreath()'>▶ Start</button>
+          <button class='btn btn-secondary' id='breathPauseBtn' style='display:none' onclick='pauseBreath()'>⏸ Pause</button>
+          <button class='btn btn-primary' id='breathResumeBtn' style='display:none' onclick='resumeBreath()'>▶ Resume</button>
+          <button class='btn btn-ghost' id='breathResetBtn' onclick='resetBreath()'>↺ Reset</button>
+        </div>
+      </div>
+      <div class='result-box' style='text-align:center'>
+        <p>💡 <strong>Tip:</strong> Breathe through your nose during inhale and exhale slowly through your mouth. Regular practice reduces stress and improves focus.</p>
+      </div>
+    </div>
+  </div>`;
+}
+function setBreathMode(mode, btn){
+  breathMode=mode;
+  resetBreath();
+  document.querySelectorAll('.calc-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+}
+function startBreath(){
+  clearInterval(breathInterval);
+  breathPhase=0; breathCycle=0;
+  const cycleEl=document.getElementById('breathCycleNum');
+  if(cycleEl) cycleEl.textContent='0';
+  setHealthBtns('breathStartBtn','breathPauseBtn','breathResumeBtn','breathResetBtn','running');
+  runBreathPhase();
+}
+let breathPausedPhaseTime=0;
+function pauseBreath(){
+  clearInterval(breathInterval);
+  breathInterval=null;
+  setHealthBtns('breathStartBtn','breathPauseBtn','breathResumeBtn','breathResetBtn','paused');
+  const lbl=document.getElementById('breathPhaseLabel');
+  if(lbl) lbl.textContent='Paused';
+}
+function resumeBreath(){
+  setHealthBtns('breathStartBtn','breathPauseBtn','breathResumeBtn','breathResetBtn','running');
+  runBreathPhase();
+}
+function resetBreath(){
+  clearInterval(breathInterval); breathInterval=null;
+  breathPhase=0; breathCycle=0;
+  const circle=document.getElementById('breathCircle');
+  if(circle){circle.style.transform='scale(1)';circle.style.borderColor='#3D52D5';circle.style.boxShadow='0 0 30px rgba(61,82,213,0.3)';}
+  const lbl=document.getElementById('breathPhaseLabel');
+  const cnt=document.getElementById('breathCount');
+  const cycleEl=document.getElementById('breathCycleNum');
+  if(lbl) lbl.textContent='Ready';
+  if(cnt) cnt.textContent='–';
+  if(cycleEl) cycleEl.textContent='0';
+  setHealthBtns('breathStartBtn','breathPauseBtn','breathResumeBtn','breathResetBtn','idle');
+}
+function runBreathPhase(){
+  const m=BREATH_MODES[breathMode];
+  const phase=m.phases[breathPhase];
+  const time=m.times[breathPhase];
+  const circle=document.getElementById('breathCircle');
+  const lbl=document.getElementById('breathPhaseLabel');
+  const cnt=document.getElementById('breathCount');
+  const cycleEl=document.getElementById('breathCycleNum');
+  if(!circle) return;
+  lbl.textContent=phase;
+  circle.style.borderColor=m.color;
+  circle.style.boxShadow=`0 0 40px ${m.color}66`;
+  if(phase==='Inhale') circle.style.transform='scale(1.38)';
+  else if(phase==='Exhale') circle.style.transform='scale(1)';
+  let t=time;
+  cnt.textContent=t;
+  breathInterval=setInterval(()=>{
+    t--;
+    cnt.textContent=t;
+    if(t<=0){
+      clearInterval(breathInterval);
+      breathPhase=(breathPhase+1)%m.phases.length;
+      if(breathPhase===0){ breathCycle++; if(cycleEl) cycleEl.textContent=breathCycle; }
+      runBreathPhase();
+    }
+  },1000);
+}
+
+/* ── LUNG HOLD (Breath Hold Test) ── */
+let lungTimer=null, lungSeconds=0, lungRunning=false;
+let lungPaused=false;
+function renderLungHold(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('health')">← Health</button></div>
+    <div class='inner-card'>
+      <h2>🫁 Lung Capacity Test</h2>
+      <p class='subtitle'>Take a deep breath, press Start, then Stop when you can't hold anymore.</p>
+      <div style='text-align:center;padding:30px 0'>
+        <div id='lungDisplay' style='font-family:Rajdhani,sans-serif;font-size:5rem;font-weight:700;color:var(--accent);line-height:1;margin-bottom:8px;'>0.0s</div>
+        <div id='lungStatus' style='font-size:14px;color:var(--muted);margin-bottom:24px'>Press Start when ready</div>
+        <div style='display:flex;gap:10px;justify-content:center;flex-wrap:wrap'>
+          <button class='btn btn-primary' id='lungStartBtn' onclick='startLung()'>🫁 Start</button>
+          <button class='btn btn-secondary' id='lungPauseBtn' style='display:none' onclick='pauseLung()'>⏸ Pause</button>
+          <button class='btn btn-primary' id='lungResumeBtn' style='display:none;font-size:13px;padding:10px 16px' onclick='resumeLung()'>▶ Resume</button>
+          <button class='btn btn-secondary' id='lungStopBtn' style='display:none' onclick='stopLung()'>⏹ Done</button>
+          <button class='btn btn-ghost' onclick='resetLung()'>↺ Reset</button>
+        </div>
+        <div id='lungResult' style='margin-top:24px'></div>
+      </div>
+      <div class='result-box' style='margin-top:0'>
+        <p style='font-weight:600;color:var(--text);margin-bottom:8px'>📊 Average Hold Times:</p>
+        <p>Untrained: <strong style='color:#f87171'>20–40s</strong> &nbsp;|&nbsp; Average: <strong style='color:#fbbf24'>40–60s</strong> &nbsp;|&nbsp; Good: <strong style='color:#4ade80'>60–90s</strong> &nbsp;|&nbsp; Excellent: <strong style='color:#a78bfa'>&gt;90s</strong></p>
+      </div>
+    </div>
+  </div>`;
+}
+function startLung(){
+  if(lungRunning) return;
+  lungRunning=true; lungPaused=false; lungSeconds=0;
+  document.getElementById('lungStatus').textContent='Hold your breath now... 🫁';
+  document.getElementById('lungResult').innerHTML='';
+  setHealthBtns('lungStartBtn','lungPauseBtn',null,null,'running');
+  document.getElementById('lungStopBtn').style.display='';
+  lungTimer=setInterval(()=>{
+    lungSeconds+=0.1;
+    const el=document.getElementById('lungDisplay');
+    if(el) el.textContent=lungSeconds.toFixed(1)+'s';
+  },100);
+}
+function pauseLung(){
+  clearInterval(lungTimer); lungRunning=false; lungPaused=true;
+  const p=document.getElementById('lungPauseBtn');
+  const r=document.getElementById('lungResumeBtn');
+  const s=document.getElementById('lungStartBtn');
+  if(p) p.style.display='none';
+  if(r) r.style.display='';
+  if(s){s.className='btn btn-paused';s.disabled=true;}
+  const st=document.getElementById('lungStatus');
+  if(st) st.textContent='Paused — press Resume to continue';
+}
+function resumeLung(){
+  lungRunning=true; lungPaused=false;
+  const p=document.getElementById('lungPauseBtn');
+  const r=document.getElementById('lungResumeBtn');
+  const s=document.getElementById('lungStartBtn');
+  if(p) p.style.display='';
+  if(r) r.style.display='none';
+  if(s){s.className='btn btn-running';s.disabled=true;}
+  const st=document.getElementById('lungStatus');
+  if(st) st.textContent='Hold your breath now... 🫁';
+  lungTimer=setInterval(()=>{
+    lungSeconds+=0.1;
+    const el=document.getElementById('lungDisplay');
+    if(el) el.textContent=lungSeconds.toFixed(1)+'s';
+  },100);
+}
+function stopLung(){
+  clearInterval(lungTimer); lungRunning=false; lungPaused=false;
+  setHealthBtns('lungStartBtn','lungPauseBtn',null,null,'idle');
+  const resumeBtn=document.getElementById('lungResumeBtn');
+  const stopBtn=document.getElementById('lungStopBtn');
+  if(resumeBtn) resumeBtn.style.display='none';
+  if(stopBtn) stopBtn.style.display='none';
+  const s=lungSeconds;
+  let rating,color;
+  if(s<20){rating='Keep practicing 💪';color='#f87171';}
+  else if(s<40){rating='Untrained range';color='#f87171';}
+  else if(s<60){rating='Average 👍';color='#fbbf24';}
+  else if(s<90){rating='Good! 🌟';color='#4ade80';}
+  else{rating='Excellent! 🏆';color='#a78bfa';}
+  document.getElementById('lungStatus').textContent='Done!';
+  document.getElementById('lungResult').innerHTML=`
+    <div class='result-box' style='text-align:center'>
+      <p>Your hold time</p>
+      <strong style='color:${color};font-size:2rem'>${s.toFixed(1)}s</strong>
+      <div style='margin-top:8px;font-size:14px;color:${color};font-weight:600'>${rating}</div>
+    </div>`;
+}
+function resetLung(){
+  clearInterval(lungTimer); lungRunning=false; lungPaused=false; lungSeconds=0;
+  const d=document.getElementById('lungDisplay');
+  const st=document.getElementById('lungStatus');
+  const r=document.getElementById('lungResult');
+  const resumeBtn=document.getElementById('lungResumeBtn');
+  const stopBtn=document.getElementById('lungStopBtn');
+  if(d) d.textContent='0.0s';
+  if(st) st.textContent='Press Start when ready';
+  if(r) r.innerHTML='';
+  if(resumeBtn) resumeBtn.style.display='none';
+  if(stopBtn) stopBtn.style.display='none';
+  setHealthBtns('lungStartBtn','lungPauseBtn',null,null,'idle');
+}
+
+/* ── BREATH RATE COUNTER ── */
+let brTimer=null, brBreaths=0, brSeconds=0, brRunning=false, brPaused=false, brSavedSeconds=0;
+function renderBreathRate(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('health')">← Health</button></div>
+    <div class='inner-card'>
+      <h2>📊 Breath Rate Counter</h2>
+      <p class='subtitle'>Press Start, then tap the big button each time you inhale for 60 seconds.</p>
+      <div style='text-align:center;padding:20px 0'>
+        <div style='display:flex;justify-content:center;gap:40px;margin-bottom:24px'>
+          <div>
+            <div style='font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase'>Breaths</div>
+            <div id='brBreathsEl' style='font-family:Rajdhani,sans-serif;font-size:3.5rem;font-weight:700;color:var(--accent)'>0</div>
+          </div>
+          <div>
+            <div style='font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase'>Time Left</div>
+            <div id='brTimerEl' style='font-family:Rajdhani,sans-serif;font-size:3.5rem;font-weight:700;color:#a78bfa'>60</div>
+          </div>
+        </div>
+        <button id='brTapBtn' onclick='brTap()' class='tap-btn-idle' style='
+          width:150px;height:150px;border-radius:50%;
+          background:linear-gradient(135deg,#f87171,#ef4444);
+          border:3px solid transparent;
+          cursor:pointer;font-size:1.1rem;
+          transition:transform .1s, opacity .3s;
+          color:#fff;font-weight:800;
+          font-family:DM Sans,sans-serif;
+          display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+          margin:0 auto;
+        ' onmousedown='this.style.transform="scale(.92)"' onmouseup='this.style.transform="scale(1)"' ontouchstart='this.style.transform="scale(.92)"' ontouchend='this.style.transform="scale(1)"'>
+          <span style='font-size:2rem'>🌬️</span>
+          <span>Inhale</span>
+        </button>
+        <div id='brHint' style='margin-top:10px;font-size:13px;color:var(--muted)'>Press Start first</div>
+        <div style='display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap'>
+          <button class='btn btn-primary' id='brStartBtn' onclick='brStart()'>▶ Start</button>
+          <button class='btn btn-secondary' id='brPauseBtn' style='display:none' onclick='brPause()'>⏸ Pause</button>
+          <button class='btn btn-primary' id='brResumeBtn' style='display:none;font-size:13px;padding:10px 16px' onclick='brResume()'>▶ Resume</button>
+          <button class='btn btn-ghost' id='brResetBtn' onclick='brReset()'>↺ Reset</button>
+        </div>
+        <div id='brResult' style='margin-top:20px'></div>
+      </div>
+      <div class='result-box'>
+        <p>Normal adult breathing rate: <strong style='color:#4ade80'>12–20 breaths/min</strong></p>
+      </div>
+    </div>
+  </div>`;
+}
+function brActivateTap(){
+  const tapBtn=document.getElementById('brTapBtn');
+  if(tapBtn){tapBtn.classList.remove('tap-btn-idle');tapBtn.classList.add('tap-btn-active');tapBtn.style.opacity='1';tapBtn.style.borderColor='#f87171';}
+}
+function brDeactivateTap(){
+  const tapBtn=document.getElementById('brTapBtn');
+  if(tapBtn){tapBtn.classList.remove('tap-btn-active');tapBtn.classList.add('tap-btn-idle');}
+}
+function brRunTimer(){
+  brTimer=setInterval(()=>{
+    brSeconds--;
+    const el=document.getElementById('brTimerEl');
+    if(el) el.textContent=brSeconds;
+    if(brSeconds<=0){
+      clearInterval(brTimer); brRunning=false;
+      brDeactivateTap();
+      setHealthBtns('brStartBtn','brPauseBtn',null,null,'idle');
+      document.getElementById('brResumeBtn').style.display='none';
+      const hint=document.getElementById('brHint');
+      if(hint) hint.textContent='Done!';
+      let rating,color;
+      if(brBreaths<12){rating='Below normal – try to relax';color='#f87171';}
+      else if(brBreaths<=20){rating='Normal ✅';color='#4ade80';}
+      else{rating='Above normal – try to slow down';color='#fbbf24';}
+      const r=document.getElementById('brResult');
+      if(r) r.innerHTML=`<div class='result-box' style='text-align:center'>
+        <p>Your breathing rate</p>
+        <strong style='font-size:2rem;color:${color}'>${brBreaths} breaths/min</strong>
+        <div style='margin-top:8px;font-size:14px;color:${color};font-weight:600'>${rating}</div>
+      </div>`;
+    }
+  },1000);
+}
+function brStart(){
+  if(brRunning) return;
+  brRunning=true; brPaused=false; brBreaths=0; brSeconds=60;
+  document.getElementById('brBreathsEl').textContent='0';
+  document.getElementById('brTimerEl').textContent='60';
+  document.getElementById('brResult').innerHTML='';
+  brActivateTap();
+  const hint=document.getElementById('brHint');
+  if(hint) hint.textContent='👆 Tap every time you inhale!';
+  setHealthBtns('brStartBtn','brPauseBtn',null,null,'running');
+  brRunTimer();
+}
+function brPause(){
+  clearInterval(brTimer); brRunning=false; brPaused=true;
+  brDeactivateTap();
+  const pauseBtn=document.getElementById('brPauseBtn');
+  const resumeBtn=document.getElementById('brResumeBtn');
+  const startBtn=document.getElementById('brStartBtn');
+  if(pauseBtn) pauseBtn.style.display='none';
+  if(resumeBtn) resumeBtn.style.display='';
+  if(startBtn){startBtn.className='btn btn-paused';startBtn.disabled=true;}
+  const hint=document.getElementById('brHint');
+  if(hint) hint.textContent='Paused — press Resume to continue';
+}
+function brResume(){
+  brRunning=true; brPaused=false;
+  brActivateTap();
+  const pauseBtn=document.getElementById('brPauseBtn');
+  const resumeBtn=document.getElementById('brResumeBtn');
+  const startBtn=document.getElementById('brStartBtn');
+  if(pauseBtn) pauseBtn.style.display='';
+  if(resumeBtn) resumeBtn.style.display='none';
+  if(startBtn){startBtn.className='btn btn-running';startBtn.disabled=true;}
+  const hint=document.getElementById('brHint');
+  if(hint) hint.textContent='👆 Tap every time you inhale!';
+  brRunTimer();
+}
+function brTap(){
+  if(!brRunning) return;
+  brBreaths++;
+  const el=document.getElementById('brBreathsEl');
+  if(el) el.textContent=brBreaths;
+}
+function brReset(){
+  clearInterval(brTimer);
+  brRunning=false; brPaused=false; brBreaths=0; brSeconds=60;
+  brDeactivateTap();
+  setHealthBtns('brStartBtn','brPauseBtn',null,null,'idle');
+  const resumeBtn=document.getElementById('brResumeBtn');
+  if(resumeBtn) resumeBtn.style.display='none';
+  const b=document.getElementById('brBreathsEl');
+  const t=document.getElementById('brTimerEl');
+  const r=document.getElementById('brResult');
+  const hint=document.getElementById('brHint');
+  if(b) b.textContent='0';
+  if(t) t.textContent='60';
+  if(r) r.innerHTML='';
+  if(hint) hint.textContent='Press Start first';
+}
+
+/* ── HEART RATE MONITOR ── */
+let hrTaps=[];
+function renderHeartRate(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('health')">← Health</button></div>
+    <div class='inner-card'>
+      <h2>❤️ Heart Rate Monitor</h2>
+      <p class='subtitle'>Tap the heart each time you feel your pulse. Uses last 10 taps for accuracy.</p>
+      <div style='text-align:center;padding:20px 0'>
+        <div id='hrDisplay' style='font-family:Rajdhani,sans-serif;font-size:5rem;font-weight:700;color:#f87171;line-height:1'>--</div>
+        <div style='font-size:13px;color:var(--muted);margin-bottom:24px'>BPM (beats per minute)</div>
+        <button onclick='hrTap()' id='hrTapBtn' style='
+          width:150px;height:150px;border-radius:50%;
+          background:linear-gradient(135deg,#f87171,#ef4444);
+          border:none;cursor:pointer;font-size:2.5rem;
+          box-shadow:0 0 30px rgba(248,113,113,0.5);
+          transition:transform .1s;color:#fff;
+          display:flex;align-items:center;justify-content:center;
+          margin:0 auto;
+          animation:tapPulse 1.2s ease-in-out infinite;
+        ' onmousedown='this.style.transform="scale(.88)"' onmouseup='this.style.transform="scale(1)"' ontouchstart='this.style.transform="scale(.88)"' ontouchend='this.style.transform="scale(1)"'>
+          ❤️
+        </button>
+        <div id='hrTapCount' style='margin-top:14px;font-size:13px;color:var(--muted)'>Just tap — no start needed</div>
+        <button class='btn btn-ghost' style='margin-top:16px' onclick='hrReset()'>↺ Reset</button>
+        <div id='hrZone' style='margin-top:20px'></div>
+      </div>
+      <div class='result-box'>
+        <p><strong style='color:#4ade80'>Normal resting HR:</strong> 60–100 BPM &nbsp;|&nbsp; <strong style='color:#a78bfa'>Athletes:</strong> 40–60 BPM</p>
+      </div>
+    </div>
+  </div>`;
+}
+function hrTap(){
+  hrTaps.push(Date.now());
+  if(hrTaps.length>10) hrTaps.shift();
+  const el=document.getElementById('hrTapCount');
+  if(el) el.textContent=`${hrTaps.length} tap${hrTaps.length===1?'':'s'} recorded — keep going!`;
+  if(hrTaps.length>=2){
+    const intervals=[];
+    for(let i=1;i<hrTaps.length;i++) intervals.push(hrTaps[i]-hrTaps[i-1]);
+    const avgInterval=intervals.reduce((a,b)=>a+b,0)/intervals.length;
+    const bpm=Math.round(60000/avgInterval);
+    const d=document.getElementById('hrDisplay');
+    if(d) d.textContent=bpm;
+    let zone,color;
+    if(bpm<60){zone='Below normal';color='#60a5fa';}
+    else if(bpm<=100){zone='Normal resting ✅';color='#4ade80';}
+    else if(bpm<=140){zone='Moderate exercise';color='#fbbf24';}
+    else{zone='High intensity';color='#f87171';}
+    const z=document.getElementById('hrZone');
+    if(z) z.innerHTML=`<div style='font-size:14px;color:${color};font-weight:600'>${zone}</div>`;
+  }
+}
+function hrReset(){
+  hrTaps=[];
+  const d=document.getElementById('hrDisplay');
+  const t=document.getElementById('hrTapCount');
+  const z=document.getElementById('hrZone');
+  if(d) d.textContent='--';
+  if(t) t.textContent='Just tap — no start needed';
+  if(z) z.innerHTML='';
+}
+
+/* ── HEART RATE ZONES ── */
+function renderHeartZone(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('health')">← Health</button></div>
+    <div class='inner-card'>
+      <h2>🏃 Heart Rate Zones</h2>
+      <p class='subtitle'>Find your personalised training zones based on age and max heart rate.</p>
+      <label class='field-label'>Your Age</label>
+      <input class='ks-input' id='hzAge' type='number' placeholder='e.g. 25' min='10' max='100'>
+      <label class='field-label' style='margin-top:12px'>Max Heart Rate <span style='color:var(--sub);font-size:11px'>(leave blank to auto-calculate)</span></label>
+      <input class='ks-input' id='hzMax' type='number' placeholder='Auto: 220 − Age'>
+      <button class='btn btn-primary' style='margin-top:14px' onclick='calcHeartZones()'>💓 Calculate Zones</button>
+      <div id='hzResult' style='margin-top:16px'></div>
+    </div>
+  </div>`;
+}
+function calcHeartZones(){
+  const age=parseInt(document.getElementById('hzAge').value);
+  if(!age||age<10||age>100){alert('Enter a valid age between 10 and 100');return;}
+  const maxHR=parseInt(document.getElementById('hzMax').value)||220-age;
+  const zones=[
+    {name:'Zone 1 — Warm Up',    pct:'50–60%', min:Math.round(maxHR*0.50), max:Math.round(maxHR*0.60), color:'#60a5fa', desc:'Light activity, recovery'},
+    {name:'Zone 2 — Fat Burn',   pct:'60–70%', min:Math.round(maxHR*0.60), max:Math.round(maxHR*0.70), color:'#4ade80', desc:'Fat burning, endurance base'},
+    {name:'Zone 3 — Aerobic',    pct:'70–80%', min:Math.round(maxHR*0.70), max:Math.round(maxHR*0.80), color:'#fbbf24', desc:'Cardiovascular fitness'},
+    {name:'Zone 4 — Anaerobic',  pct:'80–90%', min:Math.round(maxHR*0.80), max:Math.round(maxHR*0.90), color:'#f97316', desc:'Speed & performance'},
+    {name:'Zone 5 — Max Effort', pct:'90–100%',min:Math.round(maxHR*0.90), max:maxHR,                  color:'#f87171', desc:'Maximum intensity, short bursts'}
+  ];
+  const el=document.getElementById('hzResult');
+  el.innerHTML=`
+    <div style='font-size:13px;color:var(--muted);margin-bottom:12px'>Max HR: <strong style='color:var(--accent)'>${maxHR} BPM</strong> (Age: ${age})</div>
+    ${zones.map(z=>`
+    <div style='background:#0a0c14;border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px'>
+      <div style='width:4px;border-radius:4px;align-self:stretch;background:${z.color};flex-shrink:0'></div>
+      <div style='flex:1'>
+        <div style='font-weight:700;font-size:14px;color:${z.color}'>${z.name}</div>
+        <div style='font-size:12px;color:var(--muted)'>${z.desc}</div>
+      </div>
+      <div style='text-align:right;flex-shrink:0'>
+        <div style='font-family:Rajdhani,sans-serif;font-size:1.1rem;font-weight:700;color:var(--text)'>${z.min}–${z.max}</div>
+        <div style='font-size:11px;color:var(--muted)'>${z.pct} BPM</div>
+      </div>
+    </div>`).join('')}`;
+}
+
+/* ── STRESS RELIEF TIMER ── */
+let stressTimer=null, stressRunning=false, stressPaused=false;
+const STRESS_SCRIPT=[
+  {phase:'Breathe In',dur:4,msg:'Inhale slowly through your nose',color:'#4ade80'},
+  {phase:'Hold',dur:4,msg:'Hold gently — you are safe',color:'#a78bfa'},
+  {phase:'Breathe Out',dur:6,msg:'Exhale slowly, release all tension',color:'#60a5fa'},
+  {phase:'Pause',dur:2,msg:'You are calm. You are at peace.',color:'#fbbf24'},
+];
+let stressScriptIdx=0, stressSecondsLeft=0;
+function renderStress(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('health')">← Health</button></div>
+    <div class='inner-card'>
+      <h2>🧘 Stress Relief Timer</h2>
+      <p class='subtitle'>A guided session with breathing, pause and affirmation phases.</p>
+      <div style='text-align:center;padding:20px 0'>
+        <div id='stressCircle' style='
+          width:160px;height:160px;border-radius:50%;
+          background:radial-gradient(circle,#1a1a3a,#0a0c14);
+          border:3px solid #a78bfa;
+          display:flex;flex-direction:column;align-items:center;justify-content:center;
+          margin:0 auto 16px;
+          box-shadow:0 0 30px rgba(167,139,250,0.3);
+          transition:border-color .5s, box-shadow .5s;
+        '>
+          <div id='stressPhase' style='font-family:Syne,sans-serif;font-weight:800;font-size:0.95rem;color:#a78bfa'>Ready</div>
+          <div id='stressCount' style='font-family:Rajdhani,sans-serif;font-size:3rem;font-weight:700;color:#fff;line-height:1'>–</div>
+        </div>
+        <div id='stressMsg' style='font-size:14px;color:var(--muted);margin-bottom:16px;min-height:20px'>Take a comfortable seat and relax</div>
+        <div style='display:flex;gap:10px;justify-content:center;flex-wrap:wrap'>
+          <button class='btn btn-primary' id='stressStartBtn' onclick='startStress()'>🧘 Start Session</button>
+          <button class='btn btn-secondary' id='stressPauseBtn' style='display:none' onclick='pauseStress()'>⏸ Pause</button>
+          <button class='btn btn-primary' id='stressResumeBtn' style='display:none' onclick='resumeStress()'>▶ Resume</button>
+          <button class='btn btn-ghost' id='stressResetBtn' onclick='resetStress()'>↺ Reset</button>
+        </div>
+      </div>
+      <div class='result-box'>
+        <p>This session combines breathing, pausing and gentle affirmations to reduce stress. Best done daily. 🌿</p>
+      </div>
+    </div>
+  </div>`;
+}
+function startStress(){
+  clearInterval(stressTimer);
+  stressRunning=true; stressPaused=false; stressScriptIdx=0;
+  setHealthBtns('stressStartBtn','stressPauseBtn','stressResumeBtn','stressResetBtn','running');
+  runStressPhase();
+}
+function pauseStress(){
+  clearInterval(stressTimer);
+  stressPaused=true; stressRunning=false;
+  setHealthBtns('stressStartBtn','stressPauseBtn','stressResumeBtn','stressResetBtn','paused');
+  const phase=document.getElementById('stressPhase');
+  if(phase) phase.textContent='Paused';
+}
+function resumeStress(){
+  stressPaused=false; stressRunning=true;
+  setHealthBtns('stressStartBtn','stressPauseBtn','stressResumeBtn','stressResetBtn','running');
+  runStressPhase();
+}
+function resetStress(){
+  clearInterval(stressTimer);
+  stressRunning=false; stressPaused=false; stressScriptIdx=0;
+  setHealthBtns('stressStartBtn','stressPauseBtn','stressResumeBtn','stressResetBtn','idle');
+  const circle=document.getElementById('stressCircle');
+  if(circle){circle.style.borderColor='#a78bfa';circle.style.boxShadow='0 0 30px rgba(167,139,250,0.3)';}
+  const phase=document.getElementById('stressPhase');
+  const count=document.getElementById('stressCount');
+  const msg=document.getElementById('stressMsg');
+  if(phase) phase.textContent='Ready';
+  if(count) count.textContent='–';
+  if(msg) msg.textContent='Take a comfortable seat and relax';
+}
+function runStressPhase(){
+  if(!stressRunning) return;
+  const p=STRESS_SCRIPT[stressScriptIdx];
+  const circle=document.getElementById('stressCircle');
+  const phase=document.getElementById('stressPhase');
+  const count=document.getElementById('stressCount');
+  const msg=document.getElementById('stressMsg');
+  if(!circle) return;
+  if(phase) phase.textContent=p.phase;
+  if(msg) msg.textContent=p.msg;
+  circle.style.borderColor=p.color;
+  circle.style.boxShadow=`0 0 30px ${p.color}55`;
+  stressSecondsLeft=p.dur;
+  if(count) count.textContent=stressSecondsLeft+'s';
+  stressTimer=setInterval(()=>{
+    stressSecondsLeft--;
+    if(count) count.textContent=stressSecondsLeft+'s';
+    if(stressSecondsLeft<=0){
+      clearInterval(stressTimer);
+      stressScriptIdx=(stressScriptIdx+1)%STRESS_SCRIPT.length;
+      runStressPhase();
+    }
+  },1000);
+}
+
+/* ── 20-20-20 EYE TIMER ── */
+let eyeTimer=null, eyeSeconds=0, eyePhase='work', eyeRunning=false, eyePaused=false;
+function renderEyeTimer(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('health')">← Health</button></div>
+    <div class='inner-card'>
+      <h2>👁️ 20-20-20 Eye Timer</h2>
+      <p class='subtitle'>Every 20 minutes, look at something 20 feet away for 20 seconds. Reduces digital eye strain.</p>
+      <div style='text-align:center;padding:20px 0'>
+        <div id='eyeDisplay' style='font-family:Rajdhani,sans-serif;font-size:5rem;font-weight:700;color:var(--accent);line-height:1'>20:00</div>
+        <div id='eyePhaseLabel' style='font-size:14px;color:var(--muted);margin:8px 0 24px'>20 min work session</div>
+        <div style='display:flex;gap:10px;justify-content:center;flex-wrap:wrap'>
+          <button class='btn btn-primary' id='eyeStartBtn' onclick='startEye()'>👁️ Start Timer</button>
+          <button class='btn btn-secondary' id='eyePauseBtn' style='display:none' onclick='pauseEye()'>⏸ Pause</button>
+          <button class='btn btn-primary' id='eyeResumeBtn' style='display:none' onclick='resumeEye()'>▶ Resume</button>
+          <button class='btn btn-ghost' id='eyeResetBtn' onclick='resetEye()'>↺ Reset</button>
+        </div>
+        <div id='eyeMsg' style='margin-top:16px;font-size:14px;color:var(--muted);min-height:20px'></div>
+      </div>
+      <div class='result-box'>
+        <p><strong style='color:var(--accent)'>The 20-20-20 Rule:</strong> For every 20 minutes of screen time, look at something 20 feet (6 meters) away for 20 seconds. This relaxes eye muscles and prevents strain.</p>
+      </div>
+    </div>
+  </div>`;
+}
+function startEye(){
+  if(eyeRunning) return;
+  eyeRunning=true; eyePaused=false;
+  eyePhase='work'; eyeSeconds=20*60;
+  updateEyeDisplay();
+  setHealthBtns('eyeStartBtn','eyePauseBtn','eyeResumeBtn','eyeResetBtn','running');
+  runEyeTimer();
+}
+function pauseEye(){
+  clearInterval(eyeTimer);
+  eyeRunning=false; eyePaused=true;
+  setHealthBtns('eyeStartBtn','eyePauseBtn','eyeResumeBtn','eyeResetBtn','paused');
+}
+function resumeEye(){
+  eyeRunning=true; eyePaused=false;
+  setHealthBtns('eyeStartBtn','eyePauseBtn','eyeResumeBtn','eyeResetBtn','running');
+  runEyeTimer();
+}
+function runEyeTimer(){
+  eyeTimer=setInterval(()=>{
+    eyeSeconds--;
+    updateEyeDisplay();
+    if(eyeSeconds<=0){
+      clearInterval(eyeTimer);
+      if(eyePhase==='work'){
+        eyePhase='rest'; eyeSeconds=20;
+        const lbl=document.getElementById('eyePhaseLabel');
+        const msg=document.getElementById('eyeMsg');
+        const d=document.getElementById('eyeDisplay');
+        if(lbl) lbl.textContent='👁️ REST — Look 20 feet away!';
+        if(msg) msg.textContent='🔔 Time to rest your eyes!';
+        if(d) d.style.color='#4ade80';
+        runEyeTimer();
+      } else {
+        eyePhase='work'; eyeSeconds=20*60;
+        const lbl=document.getElementById('eyePhaseLabel');
+        const msg=document.getElementById('eyeMsg');
+        const d=document.getElementById('eyeDisplay');
+        if(lbl) lbl.textContent='20 min work session';
+        if(msg) msg.textContent='✅ Great! Back to work.';
+        if(d) d.style.color='var(--accent)';
+        setTimeout(()=>{const m=document.getElementById('eyeMsg');if(m&&eyeRunning)m.textContent='';},3000);
+        runEyeTimer();
+      }
+    }
+  },1000);
+}
+function updateEyeDisplay(){
+  const m=Math.floor(eyeSeconds/60), s=eyeSeconds%60;
+  const d=document.getElementById('eyeDisplay');
+  if(d) d.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function resetEye(){
+  clearInterval(eyeTimer);
+  eyeRunning=false; eyePaused=false;
+  eyePhase='work'; eyeSeconds=20*60;
+  setHealthBtns('eyeStartBtn','eyePauseBtn','eyeResumeBtn','eyeResetBtn','idle');
+  const d=document.getElementById('eyeDisplay');
+  const lbl=document.getElementById('eyePhaseLabel');
+  const msg=document.getElementById('eyeMsg');
+  if(d){d.textContent='20:00';d.style.color='var(--accent)';}
+  if(lbl) lbl.textContent='20 min work session';
+  if(msg) msg.textContent='';
+}
+
+/* ── WATER INTAKE TRACKER ── */
+let waterGoal=8, waterCurrent=0;
+function renderWater(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('health')">← Health</button></div>
+    <div class='inner-card'>
+      <h2>💧 Water Intake Tracker</h2>
+      <p class='subtitle'>Track your daily hydration. Stay healthy — drink enough water!</p>
+      <div style='display:flex;gap:10px;align-items:center;margin-bottom:20px'>
+        <label class='field-label' style='margin:0;white-space:nowrap'>Daily Goal (glasses):</label>
+        <input class='ks-input' id='waterGoalInput' type='number' value='8' min='1' max='20' style='max-width:80px' oninput='setWaterGoal(this.value)'>
+      </div>
+      <div style='text-align:center;padding:10px 0 20px'>
+        <div id='waterProgressWrap' style='max-width:300px;margin:0 auto 16px'>
+          <div style='display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px' id='waterGrid'></div>
+        </div>
+        <div style='font-family:Rajdhani,sans-serif;font-size:3rem;font-weight:700;color:#60a5fa;line-height:1'>
+          <span id='waterCurrent'>0</span>/<span id='waterGoalDisplay'>8</span>
+        </div>
+        <div style='font-size:13px;color:var(--muted);margin-bottom:20px'>glasses today</div>
+        <div style='display:flex;gap:10px;justify-content:center;flex-wrap:wrap'>
+          <button class='btn btn-primary' onclick='addWater()'>💧 +1 Glass</button>
+          <button class='btn btn-secondary' onclick='removeWater()'>− Remove Last</button>
+          <button class='btn btn-ghost' onclick='resetWater()'>↺ Reset Day</button>
+        </div>
+        <div id='waterMsg' style='margin-top:16px;font-size:14px;min-height:20px;color:#4ade80'></div>
+      </div>
+      <div class='result-box'>
+        <p>💡 Health experts recommend <strong style='color:#60a5fa'>8 glasses (2L)</strong> of water per day for average adults. Adjust based on your weight, activity and climate.</p>
+      </div>
+    </div>
+  </div>`;
+  renderWaterGrid();
+}
+function setWaterGoal(val){
+  const v=parseInt(val);
+  if(!v||v<1||v>20) return;
+  waterGoal=v;
+  if(waterCurrent>waterGoal) waterCurrent=waterGoal;
+  const g=document.getElementById('waterGoalDisplay');
+  if(g) g.textContent=waterGoal;
+  renderWaterGrid();
+}
+function renderWaterGrid(){
+  const grid=document.getElementById('waterGrid');
+  if(!grid) return;
+  grid.style.gridTemplateColumns=`repeat(${Math.min(waterGoal,4)},1fr)`;
+  grid.innerHTML=Array.from({length:waterGoal},(_,i)=>`
+    <div style='
+      height:60px;border-radius:12px;border:2px solid ${i<waterCurrent?'#60a5fa':'var(--border)'};
+      background:${i<waterCurrent?'rgba(96,165,250,0.2)':'#0a0c14'};
+      display:flex;align-items:center;justify-content:center;
+      font-size:${i<waterCurrent?'1.4rem':'1rem'};
+      transition:all .3s;
+    '>${i<waterCurrent?'💧':'·'}</div>`).join('');
+  const c=document.getElementById('waterCurrent');
+  if(c) c.textContent=waterCurrent;
+}
+function addWater(){
+  if(waterCurrent>=waterGoal){
+    const msg=document.getElementById('waterMsg');
+    if(msg){msg.textContent='🎉 Goal reached! Great job!';setTimeout(()=>msg.textContent='',3000);}
+    return;
+  }
+  waterCurrent++;
+  renderWaterGrid();
+  if(waterCurrent===waterGoal){
+    const msg=document.getElementById('waterMsg');
+    if(msg) msg.textContent='🎉 Daily goal reached! Stay hydrated!';
+  }
+}
+function removeWater(){
+  if(waterCurrent>0){ waterCurrent--; renderWaterGrid(); }
+}
+function resetWater(){
+  waterCurrent=0; renderWaterGrid();
+  const msg=document.getElementById('waterMsg');
+  if(msg) msg.textContent='';
 }
 
 /* ── BOOT ── */
