@@ -175,10 +175,11 @@ body{
 
 
 /* Desktop nav links */
-.nav-right{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.nav-right{display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;flex-shrink:1;min-width:0;}
+.nav-right::-webkit-scrollbar{display:none;}
 .nav-link{
   font-size:14px;font-weight:500;color:var(--muted);
-  cursor:pointer;padding:6px 12px;border-radius:8px;
+  cursor:pointer;padding:6px 10px;border-radius:8px;white-space:nowrap;
   border:none;background:none;
   transition:color .2s,background .2s;
   font-family:'DM Sans',sans-serif;white-space:nowrap;
@@ -3065,7 +3066,7 @@ function renderG2048(){
     <div class='back-row'><button class='back-btn' onclick="go('games')">← Games</button></div>
     <div class='inner-card'>
       <h2>🔢 2048</h2>
-      <div style='display:flex;gap:8px;margin-bottom:12px'>
+      <div id='g2048DiffRow' style='display:flex;gap:8px;margin-bottom:12px'>
         <button class='calc-tab ${g2048Diff==="easy"?"active":""}' onclick='set2048Diff("easy")' style='font-size:12px'>😊 Easy<br><span style='font-size:10px;opacity:.7'>4×4 slow</span></button>
         <button class='calc-tab ${g2048Diff==="medium"?"active":""}' onclick='set2048Diff("medium")' style='font-size:12px'>🤔 Medium<br><span style='font-size:10px;opacity:.7'>4×4 normal</span></button>
         <button class='calc-tab ${g2048Diff==="hard"?"active":""}' onclick='set2048Diff("hard")' style='font-size:12px'>💀 Hard<br><span style='font-size:10px;opacity:.7'>5×5 fast</span></button>
@@ -3096,9 +3097,7 @@ const TILE_COLORS={2:'#3d2a1e',4:'#4a2e1a',8:'#7c3a1a',16:'#8b2e0a',32:'#9b2200'
 function set2048Diff(diff){
   g2048Diff=diff; g2048Best=0;
   document.querySelectorAll('#g2048DiffRow .calc-tab').forEach(b=>b.classList.remove('active'));
-  const btns=document.querySelectorAll('.calc-tab');
-  btns.forEach(b=>{if(b.textContent.toLowerCase().includes(diff)) b.classList.add('active');});
-  // Update grid columns
+  event.target.classList.add('active');
   const grid=document.getElementById('g2048Grid');
   if(grid){const cols=diff==='hard'?5:4;grid.style.gridTemplateColumns=`repeat(${cols},1fr)`;}
   init2048();
@@ -3208,7 +3207,7 @@ function renderMemory(){
     <div class='back-row'><button class='back-btn' onclick="go('games')">← Games</button></div>
     <div class='inner-card'>
       <h2>🃏 Memory Cards</h2>
-      <div style='display:flex;gap:8px;margin-bottom:12px'>
+      <div id='memDiffRow' style='display:flex;gap:8px;margin-bottom:12px'>
         <button class='calc-tab ${memDiff==="easy"?"active":""}' onclick='setMemDiff("easy")' style='font-size:12px'>😊 Easy<br><span style='font-size:10px;opacity:.7'>4 pairs</span></button>
         <button class='calc-tab ${memDiff==="medium"?"active":""}' onclick='setMemDiff("medium")' style='font-size:12px'>🤔 Medium<br><span style='font-size:10px;opacity:.7'>8 pairs</span></button>
         <button class='calc-tab ${memDiff==="hard"?"active":""}' onclick='setMemDiff("hard")' style='font-size:12px'>💀 Hard<br><span style='font-size:10px;opacity:.7'>16 pairs</span></button>
@@ -3234,6 +3233,8 @@ function renderMemory(){
 }
 function setMemDiff(diff){
   memDiff=diff;
+  document.querySelectorAll('#memDiffRow .calc-tab').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
   initMemory();
 }
 function getMemPairs(){return memDiff==='easy'?4:memDiff==='hard'?16:8;}
@@ -3298,7 +3299,7 @@ function renderSnake(){
     <div class='back-row'><button class='back-btn' onclick="go('games')">← Games</button></div>
     <div class='inner-card'>
       <h2>🐍 Snake</h2>
-      <div style='display:flex;gap:8px;margin-bottom:12px'>
+      <div id='snakeDiffRow' style='display:flex;gap:8px;margin-bottom:12px'>
         <button class='calc-tab ${snakeDiff==="easy"?"active":""}' onclick='setSnakeDiff("easy")' style='font-size:12px'>😊 Easy<br><span style='font-size:10px;opacity:.7'>slow</span></button>
         <button class='calc-tab ${snakeDiff==="medium"?"active":""}' onclick='setSnakeDiff("medium")' style='font-size:12px'>🤔 Medium<br><span style='font-size:10px;opacity:.7'>normal</span></button>
         <button class='calc-tab ${snakeDiff==="hard"?"active":""}' onclick='setSnakeDiff("hard")' style='font-size:12px'>💀 Hard<br><span style='font-size:10px;opacity:.7'>fast!</span></button>
@@ -3334,7 +3335,12 @@ function renderSnake(){
   setupSnakeTouch();
 }
 const SNAKE_COLS=18, SNAKE_ROWS=18, SNAKE_SIZE=20;
-function setSnakeDiff(diff){snakeDiff=diff;snakeBest=0;initSnake();}
+function setSnakeDiff(diff){
+  snakeDiff=diff; snakeBest=0;
+  document.querySelectorAll('#snakeDiffRow .calc-tab').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  initSnake();
+}
 function getSnakeStartSpeed(){return snakeDiff==='easy'?220:snakeDiff==='hard'?90:150;}
 function initSnake(){
   clearInterval(snakeLoop);
@@ -4238,7 +4244,7 @@ function removeWater(){
   if(waterCurrent>0){ waterCurrent--; renderWaterGrid(); }
 }
 function resetWater(){
-  waterCurrent=0; renderWaterGrid();
+  waterCurrent=0; renderWaterrid();
   const msg=document.getElementById('waterMsg');
   if(msg) msg.textContent='';
 }
