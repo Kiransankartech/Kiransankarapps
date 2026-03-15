@@ -826,11 +826,11 @@ footer strong{color:var(--accent);}
     <div class="nav-mobile-icon">🔬</div>
     <span class="nav-mobile-label">Science Solver</span>
     <span class="nav-mobile-arrow">›</span>
-    <button class="nav-mobile-link" onclick="mobileGo('services')">
+  </button>
+  <button class="nav-mobile-link" onclick="mobileGo('services')">
     <div class="nav-mobile-icon">🌐</div>
     <span class="nav-mobile-label">Other Services</span>
     <span class="nav-mobile-arrow">›</span>
-    </button>
   </button>
   <button class="nav-mobile-link" onclick="mobileScrollContact()">
     <div class="nav-mobile-icon">✉️</div>
@@ -1036,23 +1036,7 @@ function go(page){
   else if(page==='water') renderWater();
   else{const a=APPS.find(x=>x.id===page);if(a)a.render();else renderHome();}
   window.scrollTo({top:0,behavior:'smooth'});
-}function renderServices(){
-  appEl.innerHTML=`<div class='page-wrap'>
-    <div class='back-row'><button class='back-btn' onclick="go('home')">← Home</button></div>
-    <div class='inner-card'>
-      <h2>🌐 Other Services</h2>
-      <p style='color:var(--muted);font-size:13px;margin-bottom:20px'>More free tools and platforms by Kiran Sankar.</p>
-      <div class='app-card' onclick="window.open('https://kiransankartech.github.io/SoftBooks','_blank')" style='cursor:pointer'>
-        <div class='app-card-left'>
-          <div class='app-icon'>📚</div>
-          <div>
-            <div class='app-name'>SoftBooks</div>
-            <div class='app-desc'>Free PDF book library — read anything, anytime</div>
-          </div>
-        </div>
-        <div class='app-arrow'>↗</div>
-      </div>
-    </div>
+}
 
 const IG='https://instagram.com/kstech_official';
 const EMAIL='contactkstech@gmail.com';
@@ -4342,271 +4326,204 @@ function resetWater(){
 }
 renderHome();
 
-/* ═══════════════════════════════════════════════════
-   KS TECH — AI FEATURES
-   Gemini 1.5 Flash (free tier)
-═══════════════════════════════════════════════════ */
-const GEMINI_KEY = 'AIzaSyCWKh7Lanu_XwpjJxFQhLH-gRQ5DiGujvk';
 
-async function callGemini(prompt) {
-  const models = [
-    'gemini-2.5-flash',
-    'gemini-2.0-flash-latest',
-    'gemini-1.5-flash'
-  ];
-  for(const model of models){
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            role: 'user',
-            parts: [{text: prompt}]
-          }],
-          generationConfig: {
-            maxOutputTokens: 1024,
-            temperature: 0.7
-          }
-        })
-      });
-      if(!res.ok){
-        const err = await res.json();
-        if(err.error && err.error.code === 404) continue; // try next model
-        return '⚠️ Error: ' + (err.error ? err.error.message : 'Unknown error');
-      }
-      const data = await res.json();
-      if(data.candidates && data.candidates[0] && data.candidates[0].content)
-        return data.candidates[0].content.parts[0].text;
-      if(data.error) return '⚠️ ' + data.error.message;
-    } catch(e) {
-      if(model === models[models.length-1])
-        return '⚠️ Could not connect to AI. Make sure the site is published on GitHub Pages, not opened as a local file.';
-      continue;
-    }
-  }
-  return '⚠️ All AI models unavailable right now. Please try again in a moment.';
+/* ═══════════════════════════════════════
+   OTHER SERVICES
+═══════════════════════════════════════ */
+function renderServices(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('home')">← Home</button></div>
+    <div class='inner-card'>
+      <h2>🌐 Other Services</h2>
+      <p style='color:var(--muted);font-size:13px;margin-bottom:20px'>More free platforms by Kiran Sankar — all free, no ads.</p>
+      <div class='app-card' onclick="window.open('https://kiransankartech.github.io/SoftBooks','_blank')" style='cursor:pointer;margin-bottom:10px'>
+        <div class='app-card-left'>
+          <div class='app-icon'>📚</div>
+          <div>
+            <div class='app-name'>SoftBooks</div>
+            <div class='app-desc'>Free PDF book library — read anything, anytime</div>
+          </div>
+        </div>
+        <div class='app-arrow'>↗</div>
+      </div>
+      <p style='color:var(--muted);font-size:12px;text-align:center;margin-top:20px'>More services coming soon...</p>
+    </div>
+  </div>`;
 }
 
-/* ── FLOATING CHATBOT ── */
-let chatOpen = false;
-let chatHistory = [];
-const CHAT_SUGGESTIONS = [
-  'How do I use the EMI calculator?',
-  'What apps do you have?',
-  'How does the Password Checker work?',
-  'What is the 20-20-20 rule?',
-  'Tell me about the games',
-];
+/* KS TECH AI */
+const GEMINI_KEY='AIzaSyAJzuOMnt1QZuWSLdK_ljbW9z0HcwoLIE4';
 
-const KS_SYSTEM = `You are KS Assistant, the friendly AI helper for KS Tech — a free web app platform built by Kiran Sankar. 
+function cleanAIText(text){
+  return text.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1')
+    .replace(/###\s*/g,'').replace(/##\s*/g,'').replace(/#\s*/g,'')
+    .replace(/\$([^$]+)\$/g,'$1').replace(/---/g,'--').trim();
+}
 
-KS Tech has:
-APPS (15): Age Calculator, LCM & HCF Calculator, BMI Calculator, Typing Speed Test, What Day Was It (Day Finder), Password Strength Checker, Number Base Converter, Word & Character Counter, EMI/Loan Calculator, Unit Converter, Stopwatch & Timer, Random Decision Maker, Calculator Hub (Simple/Scientific/Engineering/Percentage/Financial), Number-Words-Roman Converter, Morse Code Converter.
+async function callGemini(prompt){
+  var models=['gemini-2.5-flash','gemini-2.0-flash-latest','gemini-1.5-flash'];
+  for(var mi=0;mi<models.length;mi++){
+    try{
+      var url='https://generativelanguage.googleapis.com/v1beta/models/'+models[mi]+':generateContent?key='+GEMINI_KEY;
+      var res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:1024,temperature:0.7}})});
+      var data=await res.json();
+      if(data.error&&(data.error.code===404||data.error.code===400)){continue;}
+      if(data.error&&data.error.code===403){return 'API key blocked. Set Application Restrictions to None in Google Cloud Console.';}
+      if(data.error){return 'Error: '+data.error.message;}
+      if(data.candidates&&data.candidates[0]&&data.candidates[0].content)
+        return data.candidates[0].content.parts[0].text;
+    }catch(e){continue;}
+  }
+  return 'AI unavailable. Please try again.';
+}
 
-GAMES (4): Tic Tac Toe (vs Friend or vs AI with Easy/Medium/Hard), 2048 (Easy 4x4 / Hard 5x5), Memory Cards (4/8/16 pairs), Snake (Easy/Medium/Hard with swipe controls).
+var chatHistory=[];
+var chatOpen=false;
+var KS_SYSTEM='You are KS Assistant for KS Tech by Kiran Sankar. Has 15 apps, 4 games, 8 health tools, Science Solver. Everything free, no ads. Be friendly and concise.';
+var CHAT_SUGGESTIONS=['How to use EMI calculator?','What apps are available?','Tell me about the games','What is 20-20-20 rule?','How does Password Checker work?'];
 
-HEALTH TOOLS (8): Guided Breathing (4-7-8, Box, Calm), Lung Hold Challenge, Breath Rate Counter, Resting Heart Rate, Heart Rate Zones, Stress Relief Timer, 20-20-20 Eye Timer, Water Intake Calculator.
-
-SCIENCE SOLVER: Solves Maths, Physics, Chemistry with step-by-step explanations.
-
-The site is free, no ads, no data stored, works on all devices. Built with pure HTML/CSS/JS. Creator: Kiran Sankar (@kstech_official on Instagram).
-
-Be friendly, helpful, concise. If someone asks a general science/math question, answer it. Keep responses short and clear. Use emojis occasionally.`;
-
-function injectChatbot() {
-  // FAB button
-  const fab = document.createElement('button');
-  fab.className = 'ks-chat-fab';
-  fab.id = 'ksChatFab';
-  fab.innerHTML = '🤖';
-  fab.title = 'KS Assistant';
-  fab.onclick = toggleChat;
+function injectChatbot(){
+  var fab=document.createElement('button');
+  fab.className='ks-chat-fab';fab.id='ksChatFab';fab.innerHTML='🤖';fab.title='KS Assistant';fab.onclick=toggleChat;
   document.body.appendChild(fab);
-
-  // Chat panel
-  const panel = document.createElement('div');
-  panel.className = 'ks-chat-panel';
-  panel.id = 'ksChatPanel';
-  panel.innerHTML = `
-    <div class="ks-chat-header">
-      <div>
-        <div class="ks-chat-title">🤖 KS Assistant</div>
-        <div class="ks-chat-subtitle">Ask me anything about KS Tech!</div>
-      </div>
-      <button class="ks-chat-close" onclick="toggleChat()">✕</button>
-    </div>
-    <div class="ks-chat-messages" id="ksChatMsgs">
-      <div class="ks-msg bot">Hey! 👋 I'm KS Assistant. I can help you use any app, game or health tool on this site — and solve science & maths questions too! What do you need?</div>
-    </div>
-    <div class="ks-chat-suggestions" id="ksChatSuggs">
-      ${CHAT_SUGGESTIONS.map(s=>`<button class="ks-sugg-btn" onclick="sendSuggestion('${s}')">${s}</button>`).join('')}
-    </div>
-    <div class="ks-chat-input-row">
-      <textarea class="ks-chat-input" id="ksChatInput" placeholder="Ask anything..." rows="1"
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
-      <button class="ks-chat-send" id="ksChatSend" onclick="sendChat()">➤</button>
-    </div>
-  `;
+  var panel=document.createElement('div');
+  panel.className='ks-chat-panel';panel.id='ksChatPanel';
+  var sh='';
+  for(var si=0;si<CHAT_SUGGESTIONS.length;si++){
+    sh+='<button class="ks-sugg-btn" onclick="sendSuggestion(this.textContent)">'+CHAT_SUGGESTIONS[si]+'</button>';
+  }
+  var h='<div class="ks-chat-header">';
+  h+='<div><div class="ks-chat-title">🤖 KS Assistant</div>';
+  h+='<div class="ks-chat-subtitle">Ask me anything!</div></div>';
+  h+='<button class="ks-chat-close" onclick="toggleChat()">X</button></div>';
+  h+='<div class="ks-chat-messages" id="ksChatMsgs">';
+  h+='<div class="ks-msg bot">Hey! Ask me about any app, game or health tool!</div></div>';
+  h+='<div class="ks-chat-suggestions" id="ksChatSuggs">'+sh+'</div>';
+  h+='<div class="ks-chat-input-row">';
+  h+='<textarea class="ks-chat-input" id="ksChatInput" placeholder="Ask anything..." rows="1" ';
+  h+='onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>';
+  h+='<button class="ks-chat-send" id="ksChatSend" onclick="sendChat()">Send</button></div>';
+  panel.innerHTML=h;
   document.body.appendChild(panel);
 }
 
-function toggleChat() {
-  chatOpen = !chatOpen;
-  const panel = document.getElementById('ksChatPanel');
-  const fab = document.getElementById('ksChatFab');
-  if(panel) panel.classList.toggle('open', chatOpen);
-  if(fab) fab.innerHTML = chatOpen ? '✕' : '🤖';
+function toggleChat(){
+  chatOpen=!chatOpen;
+  var panel=document.getElementById('ksChatPanel');
+  var fab=document.getElementById('ksChatFab');
+  if(panel)panel.classList.toggle('open',chatOpen);
+  if(fab)fab.innerHTML=chatOpen?'X':'🤖';
 }
 
-function sendSuggestion(text) {
-  const input = document.getElementById('ksChatInput');
-  if(input) { input.value = text; sendChat(); }
-  // Hide suggestions after first use
-  const suggs = document.getElementById('ksChatSuggs');
-  if(suggs) suggs.style.display = 'none';
+function sendSuggestion(text){
+  var input=document.getElementById('ksChatInput');
+  if(input){input.value=text;sendChat();}
+  var s=document.getElementById('ksChatSuggs');
+  if(s)s.style.display='none';
 }
 
-async function sendChat() {
-  const input = document.getElementById('ksChatInput');
-  const msgs = document.getElementById('ksChatMsgs');
-  const sendBtn = document.getElementById('ksChatSend');
-  if(!input || !msgs) return;
-  const text = input.value.trim();
-  if(!text) return;
-
-  // Hide suggestions
-  const suggs = document.getElementById('ksChatSuggs');
-  if(suggs) suggs.style.display = 'none';
-
-  // Add user message
-  input.value = '';
-  sendBtn.disabled = true;
-  const userMsg = document.createElement('div');
-  userMsg.className = 'ks-msg user';
-  userMsg.textContent = text;
-  msgs.appendChild(userMsg);
-
-  // Typing indicator
-  const typing = document.createElement('div');
-  typing.className = 'ks-msg bot typing';
-  typing.innerHTML = '<div class="sci-dots"><span></span><span></span><span></span></div>';
-  msgs.appendChild(typing);
-  msgs.scrollTop = msgs.scrollHeight;
-
-  // Build conversation context
-  chatHistory.push({role:'user', text});
-  const historyContext = chatHistory.slice(-6).map(m=>`${m.role==='user'?'User':'Assistant'}: ${m.text}`).join('\n');
-  const prompt = KS_SYSTEM + '\n\nConversation so far:\n' + historyContext + '\n\nRespond as KS Assistant:';
-
-  const reply = await callGemini(prompt);
-  chatHistory.push({role:'bot', text:reply});
-
-  // Remove typing, add real reply
-  typing.remove();
-  const botMsg = document.createElement('div');
-  botMsg.className = 'ks-msg bot';
-  botMsg.textContent = reply;
-  msgs.appendChild(botMsg);
-  msgs.scrollTop = msgs.scrollHeight;
-  sendBtn.disabled = false;
-  input.focus();
+async function sendChat(){
+  var input=document.getElementById('ksChatInput');
+  var msgs=document.getElementById('ksChatMsgs');
+  var btn=document.getElementById('ksChatSend');
+  if(!input||!msgs)return;
+  var text=input.value.trim();
+  if(!text)return;
+  var s=document.getElementById('ksChatSuggs');
+  if(s)s.style.display='none';
+  input.value='';btn.disabled=true;
+  var um=document.createElement('div');um.className='ks-msg user';um.textContent=text;msgs.appendChild(um);
+  var tm=document.createElement('div');tm.className='ks-msg bot typing';
+  tm.innerHTML='<div class="sci-dots"><span></span><span></span><span></span></div>';
+  msgs.appendChild(tm);msgs.scrollTop=msgs.scrollHeight;
+  chatHistory.push({role:'user',text:text});
+  var hc='';var sl=chatHistory.slice(-6);
+  for(var hi=0;hi<sl.length;hi++){hc+=(sl[hi].role==='user'?'User':'Assistant')+': '+sl[hi].text+'\n';}
+  var reply=await callGemini(KS_SYSTEM+'\n\nConversation:\n'+hc+'\nRespond as KS Assistant:');
+  chatHistory.push({role:'bot',text:reply});
+  tm.remove();
+  var bm=document.createElement('div');bm.className='ks-msg bot';bm.textContent=cleanAIText(reply);
+  msgs.appendChild(bm);msgs.scrollTop=msgs.scrollHeight;btn.disabled=false;input.focus();
 }
 
-/* ── SCIENCE SOLVER PAGE ── */
-let sciSubject = 'maths';
-
-function renderScience() {
-  appEl.innerHTML = `<div class='page-wrap'>
-    <div class='back-row'><button class='back-btn' onclick="go('home')">← Home</button></div>
-    <div class='inner-card'>
-      <h2>🔬 Science Solver</h2>
-      <p style='color:var(--muted);font-size:13px;margin-bottom:16px'>Powered by Gemini AI. Get step-by-step solutions for Maths, Physics and Chemistry.</p>
-
-      <div class='science-tabs' id='sciTabs'>
-        <button class='calc-tab active' onclick='setSciSubject("maths",this)'>🔢 Mathematics</button>
-        <button class='calc-tab' onclick='setSciSubject("physics",this)'>⚛️ Physics</button>
-        <button class='calc-tab' onclick='setSciSubject("chemistry",this)'>🧪 Chemistry</button>
-        <button class='calc-tab' onclick='setSciSubject("general",this)'>🧠 General Science</button>
-      </div>
-
-      <div id='sciExamples' style='display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px'></div>
-
-      <label class='field-label'>Your Question</label>
-      <textarea class='ks-input' id='sciQuestion' rows='3' style='resize:vertical;font-family:DM Sans,sans-serif'
-        placeholder='Type your question here... e.g. Solve x² + 5x + 6 = 0'></textarea>
-
-      <button class='btn btn-primary' style='width:100%;margin-top:12px' onclick='solveScience()' id='sciSolveBtn'>
-        ✨ Solve with AI
-      </button>
-
-      <div id='sciOutput' style='margin-top:4px'></div>
-    </div>
-  </div>`;
-  updateSciExamples();
-}
-
-const SCI_EXAMPLES = {
-  maths: ['Solve x² + 5x + 6 = 0','Integrate x² dx','Find derivative of sin(x)','What is Pythagoras theorem?','Simplify 3/4 + 2/5'],
-  physics: ["What is Newton's second law?","Calculate force if m=5kg a=3m/s²","Explain Ohm's law","What is kinetic energy formula?","Explain refraction of light"],
-  chemistry: ['What is the atomic number of Carbon?','Balance: H₂ + O₂ → H₂O','Explain covalent bonding','What is pH scale?','Explain periodic table trends'],
-  general: ["What is DNA?","Explain the water cycle","What causes thunder?","How do vaccines work?","What is the speed of light?"]
+var sciSubject='maths';
+var SCI_EX={
+  maths:['Solve x^2+5x+6=0','Integrate x^2 dx','Derivative of sin(x)','Pythagoras theorem','3/4 + 2/5'],
+  physics:['Newton second law','Force m=5kg a=3m/s','Ohm law','Kinetic energy formula','Refraction'],
+  chemistry:['Atomic number of Carbon','Balance H2+O2','Covalent bonding','pH scale','Periodic table'],
+  general:['What is DNA','Water cycle','What causes thunder','How vaccines work','Speed of light']
 };
 
-function setSciSubject(subj, btn) {
-  sciSubject = subj;
-  document.querySelectorAll('#sciTabs .calc-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+function renderScience(){
+  var h='<div class="page-wrap">';
+  h+='<div class="back-row"><button class="back-btn" onclick="go(\'home\')">Back</button></div>';
+  h+='<div class="inner-card"><h2>Science Solver</h2>';
+  h+='<p style="color:var(--muted);font-size:13px;margin-bottom:16px">Powered by Gemini AI.</p>';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px" id="sciTabs">';
+  h+='<button class="calc-tab active" onclick="setSciSubject(\'maths\',this)">Maths</button>';
+  h+='<button class="calc-tab" onclick="setSciSubject(\'physics\',this)">Physics</button>';
+  h+='<button class="calc-tab" onclick="setSciSubject(\'chemistry\',this)">Chemistry</button>';
+  h+='<button class="calc-tab" onclick="setSciSubject(\'general\',this)">General</button>';
+  h+='</div>';
+  h+='<div id="sciExamples" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>';
+  h+='<label class="field-label">Your Question</label>';
+  h+='<textarea class="ks-input" id="sciQuestion" rows="3" style="resize:vertical" placeholder="Type your question..."></textarea>';
+  h+='<button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="solveScience()" id="sciSolveBtn">Solve with AI</button>';
+  h+='<div id="sciOutput" style="margin-top:8px"></div>';
+  h+='</div></div>';
+  appEl.innerHTML=h;
   updateSciExamples();
-  const q = document.getElementById('sciQuestion');
-  if(q) q.placeholder = 'Ask a ' + subj + ' question...';
 }
 
-function updateSciExamples() {
-  const el = document.getElementById('sciExamples');
-  if(!el) return;
-  el.innerHTML = (SCI_EXAMPLES[sciSubject]||[]).map(e=>
-    `<button class='ks-sugg-btn' onclick='useSciExample("${e.replace(/'/g,"\\'")}")'>${e}</button>`
-  ).join('');
+function setSciSubject(s,btn){
+  sciSubject=s;
+  var tabs=document.querySelectorAll('#sciTabs .calc-tab');
+  for(var i=0;i<tabs.length;i++)tabs[i].classList.remove('active');
+  if(btn)btn.classList.add('active');
+  updateSciExamples();
 }
 
-function useSciExample(text) {
-  const q = document.getElementById('sciQuestion');
-  if(q) { q.value = text; q.focus(); }
+function updateSciExamples(){
+  var el=document.getElementById('sciExamples');
+  if(!el)return;
+  var arr=SCI_EX[sciSubject]||[];
+  var h='';
+  for(var i=0;i<arr.length;i++){
+    h+='<button class="ks-sugg-btn" onclick="setSciQ(\''+arr[i].replace(/'/g,"\\'")+'\')">'+arr[i]+'</button>';
+  }
+  el.innerHTML=h;
 }
 
-async function solveScience() {
-  const q = document.getElementById('sciQuestion');
-  const out = document.getElementById('sciOutput');
-  const btn = document.getElementById('sciSolveBtn');
-  if(!q || !out) return;
-  const question = q.value.trim();
-  if(!question) { q.focus(); return; }
+function setSciQ(t){var q=document.getElementById('sciQuestion');if(q){q.value=t;q.focus();}}
 
-  btn.disabled = true;
-  btn.textContent = '⏳ Solving...';
-  out.innerHTML = `<div class='sci-loading'><div class='sci-dots'><span></span><span></span><span></span></div><span>Thinking step by step...</span></div>`;
-
-  const subjectPrompts = {
-    maths: 'You are an expert mathematics teacher. Solve the following problem step by step, showing all working clearly. Use simple language. Format nicely with numbered steps.',
-    physics: 'You are an expert physics teacher. Answer the following physics question with clear explanation, relevant formulas, and step-by-step solution if applicable.',
-    chemistry: 'You are an expert chemistry teacher. Answer the following chemistry question with clear explanation, relevant equations, and step-by-step solution if applicable.',
-    general: 'You are an expert science teacher. Answer the following science question clearly and concisely with good explanations suitable for students.'
+async function solveScience(){
+  var q=document.getElementById('sciQuestion');
+  var out=document.getElementById('sciOutput');
+  var btn=document.getElementById('sciSolveBtn');
+  if(!q||!out)return;
+  var question=q.value.trim();
+  if(!question){q.focus();return;}
+  btn.disabled=true;btn.textContent='Solving...';
+  out.innerHTML='<div class="sci-loading"><div class="sci-dots"><span></span><span></span><span></span></div><span>Thinking...</span></div>';
+  var pr={
+    maths:'You are an expert maths teacher. Solve step by step.',
+    physics:'You are an expert physics teacher. Explain with formulas.',
+    chemistry:'You are an expert chemistry teacher. Show equations.',
+    general:'You are an expert science teacher. Clear explanation.'
   };
-
-  const prompt = (subjectPrompts[sciSubject] || subjectPrompts.general) + '\n\nQuestion: ' + question;
-  const result = await callGemini(prompt);
-
-  btn.disabled = false;
-  btn.textContent = '✨ Solve with AI';
-  out.innerHTML = `<div class='sci-result'>${result.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>
-    <button class='btn' style='width:100%;margin-top:10px;background:var(--bg2);border:1px solid var(--border);color:var(--muted);border-radius:14px;padding:12px;cursor:pointer;font-family:DM Sans,sans-serif' onclick='document.getElementById("sciQuestion").value="";document.getElementById("sciOutput").innerHTML=""'>🔄 Ask Another</button>`;
+  var result=await callGemini((pr[sciSubject]||pr.general)+'\n\nQuestion: '+question);
+  btn.disabled=false;btn.textContent='Solve with AI';
+  var cleaned=cleanAIText(result).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  var oh='<div class="sci-result">'+cleaned+'</div>';
+  oh+='<button class="btn" style="width:100%;margin-top:10px;background:var(--bg2);border:1px solid var(--border);color:var(--muted);border-radius:14px;padding:12px;cursor:pointer"';
+  oh+=' onclick="document.getElementById(\'sciQuestion\').value=\'\';document.getElementById(\'sciOutput\').innerHTML=\'\'">';
+  oh+='Ask Another</button>';
+  out.innerHTML=oh;
 }
 
-/* ── BOOT AI ── */
+/* BOOT */
+renderHome();
 injectChatbot();
 
 </script>
