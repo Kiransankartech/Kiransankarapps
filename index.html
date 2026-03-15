@@ -778,6 +778,7 @@ footer strong{color:var(--accent);}
     <button class="nav-link" onclick="go('games')">🎮 Games</button>
     <button class="nav-link" onclick="go('health')">🩺 Health</button>
     <button class="nav-link" onclick="go('science')">🔬 Science</button>
+    <button class="nav-link" onclick="go('services')">🌐 Services</button>
     <button class="nav-link" onclick="scrollContact()">✉️ Contact</button>
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
       <span class="theme-icon moon">🌙</span>
@@ -825,6 +826,11 @@ footer strong{color:var(--accent);}
     <div class="nav-mobile-icon">🔬</div>
     <span class="nav-mobile-label">Science Solver</span>
     <span class="nav-mobile-arrow">›</span>
+    <button class="nav-mobile-link" onclick="mobileGo('services')">
+    <div class="nav-mobile-icon">🌐</div>
+    <span class="nav-mobile-label">Other Services</span>
+    <span class="nav-mobile-arrow">›</span>
+    </button>
   </button>
   <button class="nav-mobile-link" onclick="mobileScrollContact()">
     <div class="nav-mobile-icon">✉️</div>
@@ -1019,6 +1025,7 @@ function go(page){
   else if(page==='snake') renderSnake();
   else if(page==='health') renderHealth();
   else if(page==='science') renderScience();
+  else if(page==='services') renderServices();
   else if(page==='breath') renderBreath();
   else if(page==='lunghold') renderLungHold();
   else if(page==='breathrate') renderBreathRate();
@@ -1029,7 +1036,23 @@ function go(page){
   else if(page==='water') renderWater();
   else{const a=APPS.find(x=>x.id===page);if(a)a.render();else renderHome();}
   window.scrollTo({top:0,behavior:'smooth'});
-}
+}function renderServices(){
+  appEl.innerHTML=`<div class='page-wrap'>
+    <div class='back-row'><button class='back-btn' onclick="go('home')">← Home</button></div>
+    <div class='inner-card'>
+      <h2>🌐 Other Services</h2>
+      <p style='color:var(--muted);font-size:13px;margin-bottom:20px'>More free tools and platforms by Kiran Sankar.</p>
+      <div class='app-card' onclick="window.open('https://kiransankartech.github.io/SoftBooks','_blank')" style='cursor:pointer'>
+        <div class='app-card-left'>
+          <div class='app-icon'>📚</div>
+          <div>
+            <div class='app-name'>SoftBooks</div>
+            <div class='app-desc'>Free PDF book library — read anything, anytime</div>
+          </div>
+        </div>
+        <div class='app-arrow'>↗</div>
+      </div>
+    </div>
 
 const IG='https://instagram.com/kstech_official';
 const EMAIL='contactkstech@gmail.com';
