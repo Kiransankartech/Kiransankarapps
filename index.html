@@ -6636,11 +6636,7 @@ const app = initializeApp(firebaseConfig);
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app);
 
-// Add a test document
-addDoc(collection(db, "testCollection"), {
-  message: "Hello from my web app!",
-  time: new Date()
-});
+
 </script>
 </body>
 </html>
